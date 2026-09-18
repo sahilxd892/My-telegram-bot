@@ -2,7 +2,7 @@ import asyncio
 from aiogram import Bot, Dispatcher, types
 API_TOKEN = '8677878265:AAFJ2GMXaDerzMzaR6dzgwk-fhDslWvxTa0'
 bot = Bot(token=API_TOKEN)
-dp = Dispatcher(bot)
+dp = Dispatcher()
 @dp.message_handler(commands=['start'])
 async def send_welcome(message: types.Message):
     keyboard = types.InlineKeyboardMarkup(row_width=2)
