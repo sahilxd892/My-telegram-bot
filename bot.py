@@ -15,7 +15,7 @@ from io import BytesIO
 from aiogram import types
 from aiogram import F, Router, types
 import aiohttp
-from aiogram.types import
+from aiogram.types import CallbackQuery
 
 def init_db():
     conn = sqlite3.connect("products.db")
