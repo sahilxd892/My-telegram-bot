@@ -886,7 +886,7 @@ async def show_payment_handler(callback_query: CallbackQuery):
     plan_name = "Fetched Plan Name"
     price = 0.00
     user_balance = get_balance(callback_query.from_user.id)
-    deficit = max(0‚ price - user_balance
+    deficit = max(0, price - user_balance)
 
     message_text = (
         f"<blockquote>💰INSUFFICIENT BALANCE</blockquote>\n\n"
