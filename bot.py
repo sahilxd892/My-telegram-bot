@@ -885,7 +885,7 @@ async def show_payment_handler(callback_query: CallbackQuery):
     product_name = "Fetched Product Name"
     plan_name = "Fetched Plan Name"
     price = 0.00
-    get_balance(callback_query.from_user.id)
+    user_balance = get_balance(callback_query.from_user.id)
     deficit = price - user_balance
 
     message_text = (
