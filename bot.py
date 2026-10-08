@@ -920,6 +920,8 @@ async def show_payment_handler(callback_query: CallbackQuery):
             reply_markup=keyboard,
             parse_mode="HTML"
         )
+        await callback_query.answer()
+        
 
 
 if __name__ == '__main__':
