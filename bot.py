@@ -885,11 +885,11 @@ async def show_payment_handler(callback_query: CallbackQuery):
     product_name = "Fetched Product Name"
     plan_name = "Fetched Plan Name"
     price = 0.00
-    user_balance = 0.00
+    get_balance(callback_query.from_user.id)
     deficit = price - user_balance
 
     message_text = (
-        f"<blockquote>INSUFFICIENT BALANCE</blockquote>\n\n"
+        f"<blockquote>💰INSUFFICIENT BALANCE</blockquote>\n\n"
         f"┣Product: {product_name}\n"
         f"┣Plan: {plan_name}\n"
         f"┣Price: {price}\n"
@@ -900,7 +900,7 @@ async def show_payment_handler(callback_query: CallbackQuery):
 
     keyboard = InlineKeyboardMarkup(inline_keyboard=[
         [InlineKeyboardButton(text="PAY UPI", callback_data="pay_upi", style="success")],
-        [InlineKeyboardButton(text="Back to Plans", callback_data="buy_product_{product_id}", style="danger")]
+        [InlineKeyboardButton(text="Back to Plans", callback_data="back_to_plans", style="danger")]
     ])
 
     await callback_query.message.edit_text(
