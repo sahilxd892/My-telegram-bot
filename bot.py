@@ -885,7 +885,8 @@ async def show_payment_handler(callback_query: CallbackQuery):
     
     # यूज़र बैलेंस फेच करें
     user_balance = get_balance(user_id)
-    
+    print(f"DEBUG: user_id={user_id}, balancer={user_balance}")
+
     callback_data = callback_query.data.split("_")
     
     if len(callback_data) >= 4:
