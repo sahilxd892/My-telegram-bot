@@ -882,7 +882,7 @@ async def back_to_add_balance(call: types.CallbackQuery):
 @router.callback_query(F.data.startswith("select_plan_"))
 async def show_payment_handler(callback_query: CallbackQuery):
     # डेटाबेस से जानकारी ऑटोमेटिक फेच करने का लॉजिक यहाँ आएगा
-    product_name = "Fetched Product Name"
+    product_name = products_db.get(product_id, "Unknown Product")
     plan_name = "Fetched Plan Name"
     price = 0.00
     user_balance = get_balance(callback_query.from_user.id)
@@ -899,7 +899,7 @@ async def show_payment_handler(callback_query: CallbackQuery):
     )
 
     keyboard = InlineKeyboardMarkup(inline_keyboard=[
-        [InlineKeyboardButton(text="PAY UPI", callback_data="pay_upi", style="success")],
+        [InlineKeyboardButton(text="PAY UPI", callback_data="pay_upi_", style="success")],
         [InlineKeyboardButton(text="Back to Plans", callback_data="back_to_plans", style="danger")]
     ])
 
