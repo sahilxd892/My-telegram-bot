@@ -877,7 +877,36 @@ async def back_to_add_balance(call: types.CallbackQuery):
     await call.answer()
     
 
+@router.callback_query(F.data.startswith("select_plan_"))
+async def show_payment_handler(callback_query: CallbackQuery):
+    # डेटाबेस से जानकारी ऑटोमेटिक फेच करने का लॉजिक यहाँ आएगा
+    product_name = "Fetched Product Name"
+    plan_name = "Fetched Plan Name"
+    price = 0.00
+    user_balance = 0.00
+    deficit = price - user_balance
 
+    message_text = (
+        f"<blockquote>INSUFFICIENT BALANCE</blockquote>\n\n"
+        f"Product: {product_name}\n"
+        f"Plan: {plan_name}\n"
+        f"Price: {price}\n"
+        f"Your Balance: {user_balance}\n"
+        f"Deficit Need: {deficit}\n\n"
+        f"Select your preferred gateway option below to proceed:"
+    )
+
+    keyboard = InlineKeyboardMarkup(inline_keyboard=[
+        [InlineKeyboardButton(text="PAY UPI", callback_data="pay_upi")],
+        [InlineKeyboardButton(text="Back to Plans", callback_data="back_to_plans")]
+    ])
+
+    await callback_query.message.edit_text(
+        text=message_text,
+        reply_markup=keyboard,
+        parse_mode="HTML"
+    )
+    await callback_query.answer()
 
 
 
