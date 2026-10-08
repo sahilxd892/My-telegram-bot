@@ -222,7 +222,7 @@ async def process_check_update(call: types.CallbackQuery):
     channel_link = "https://t.me/Sahilbhaialupdate"
 
     # पुराना message हटाओ
-    await call.message.delete()
+    await message.answer()
 
     # नया message भेजो ताकि Telegram नया native preview बनाए
     await call.message.answer(
