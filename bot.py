@@ -219,23 +219,29 @@ def update_kb():
 async def process_check_update(call: types.CallbackQuery):
     await call.answer()
 
-    channel_link = "https://t.me/Sahilbhaiallupdate"
+    channel_link = "https://t.me/Sahilbhaialupdate"
 
-    text = (
-        '<blockquote>📢 Follow our updates channel: </blockquote>\n\n'
-        f'🔗 <a href="https://t.me/Sahilbhaiallupdate"><b>Click Here For Setup & Updates</b></a>\n\n'
-        f'{channel_link}'
-    )
+    # पुराना message हटाओ
+    await call.message.delete()
 
-    await call.message.edit_text(
-        text=text,
+    # नया message भेजो ताकि Telegram नया native preview बनाए
+    await call.message.answer(
+        text=(
+            "📢 <b>Follow our updates channel:</b>\n\n"
+            "💚〰️〰️〰️〰️〰️〰️〰️\n"
+            "🔗 <a href=\"https://t.me/Sahilbhaialupdate\">"
+            "<b>Click Here For Setup &amp; Updates</b>"
+            "</a>\n\n"
+            "https://t.me/Sahilbhaialupdate"
+        ),
         parse_mode="HTML",
         link_preview_options=types.LinkPreviewOptions(
             is_disabled=False,
             url=channel_link,
-            prefer_small_media=True,
+            prefer_large_media=True,
             show_above_text=False
-        )
+        ),
+        reply_markup=update_kb()
     )
 
 @dp.callback_query(F.data.startswith("amount_"))
