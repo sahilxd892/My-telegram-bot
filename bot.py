@@ -225,6 +225,9 @@ async def process_check_update(call: types.CallbackQuery):
     )
     
     await call.message.edit_text(
+        link_preview_options=types.LinkPreviewOptions(
+        is_disabled=False
+),
         text=update_text,
         parse_mode="HTML",
         reply_markup=update_kb()
