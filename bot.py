@@ -659,7 +659,7 @@ async def process_buy_product(call: types.CallbackQuery):
             [
                 types.InlineKeyboardButton(
                     text=f"{plan['plan_name']} - ₹{plan['price']}",
-                    callback_data=f"select_plan_{plan['plan_name'].replace(' ', '_')}"
+                    callback_data=f"select_plan_{plan['plan_name'].replace(' ', '_')}",
                     style="success",
                 )
             ]
