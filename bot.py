@@ -882,6 +882,7 @@ async def back_to_add_balance(call: types.CallbackQuery):
 @router.callback_query(F.data.startswith("select_plan_"))
 async def show_payment_handler(callback_query: CallbackQuery):
     # डेटाबेस से जानकारी ऑटोमेटिक फेच करने का लॉजिक यहाँ आएगा
+    product_id = callback_query.data.split("_")[2]
     product_name = products_db.get(product_id, "Unknown Product")
     plan_name = "Fetched Plan Name"
     price = 0.00
