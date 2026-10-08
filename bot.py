@@ -218,29 +218,15 @@ def update_kb():
 @dp.callback_query(F.data == "menu_check_update")
 async def process_check_update(call: types.CallbackQuery):
     await call.answer()
-
-    channel_link = "https://t.me/Sahilbhaialupdate"
-
-    # पुराना message हटाओ
-    await message.answer()
-
-    # नया message भेजो ताकि Telegram नया native preview बनाए
-    await call.message.answer(
-        text=(
-            "📢 <b>Follow our updates channel:</b>\n\n"
-            "💚〰️〰️〰️〰️〰️〰️〰️\n"
-            "🔗 <a href=\"https://t.me/Sahilbhaialupdate\">"
-            "<b>Click Here For Setup &amp; Updates</b>"
-            "</a>\n\n"
-            "https://t.me/Sahilbhaialupdate"
-        ),
+    print("Check Update button pressed")
+    update_text = (
+        "<blockquote>📢 Follow our updates channel:</blockquote>\n"
+        "🔗 <a href='https://t.me/Sahilbhaiallupdate'><b> Click Here For Setup & Updates</b></a>"
+    )
+    
+    await call.message.edit_text(
+        text=update_text,
         parse_mode="HTML",
-        link_preview_options=types.LinkPreviewOptions(
-            is_disabled=False,
-            url=channel_link,
-            prefer_large_media=True,
-            show_above_text=False
-        ),
         reply_markup=update_kb()
     )
 
