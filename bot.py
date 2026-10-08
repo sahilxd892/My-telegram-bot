@@ -888,8 +888,7 @@ async def show_payment_handler(callback_query: CallbackQuery):
     
     callback_data = callback_query.data.split("_")
     
-    # चेक करें कि कॉल बैक डेटा सही फॉर्मेट में है
-    if len(callback_data) >= 4 and callback_data[0] == "select" and callback_data[1] == "plan":
+    if len(callback_data) >= 4:
         product_id = callback_data[2]
         plan_id = callback_data[3]
         
@@ -902,7 +901,7 @@ async def show_payment_handler(callback_query: CallbackQuery):
         deficit = price - user_balance
 
         message_text = (
-            f"<blockquote><b>INSUFFICIENT BALANCE </b></blockquote>\n\n"
+            f"<blockquote><b>INSUFFICIENT BALANCE 💸</b></blockquote>\n\n"
             f"👤 Product: {product_name}\n"
             f"📅 Plan: {plan_name}\n"
             f"💰 Price: ₹{price:.2f}\n"
@@ -921,12 +920,6 @@ async def show_payment_handler(callback_query: CallbackQuery):
             reply_markup=keyboard,
             parse_mode="HTML"
         )
-        await callback_query.answer()
-        
-    else:
-        # अगर डेटा सही फॉर्मेट में नहीं है, तो एरर हैंडल करें
-        await callback_query.answer("Invalid callback data", show_alert=True)
-        return
 
 
 if __name__ == '__main__':
