@@ -224,15 +224,14 @@ async def process_check_update(call: types.CallbackQuery):
     print("Check Update button pressed")
     
     update_text = (
-        "<blockquote>📢 Follow our updates channel:</blockquote>\n\n"
-        "🔗 <a href='https://t.me/Sahilbhaiallupdate'><b>Click Here For Setup & Updates</b></a>"
+        "<blockquote>📢 Follow our updates channel:\n\n"
+        "🔗 <a href='https://t.me/Sahilbhaiallupdate'><b>Click Here For Setup & Updates</b></a></blockquote>"
     )
-
+    
     await call.message.edit_text(
         text=update_text,
         parse_mode="HTML",
         reply_markup=update_kb(),
-        # यह Telegram को छोटा पासपोर्ट-साइज़ डीपी/कार्ड (Link Preview) दिखाने को कहेगा
         link_preview_options=LinkPreviewOptions(
             is_disabled=False,
             url="https://t.me/Sahilbhaiallupdate",
