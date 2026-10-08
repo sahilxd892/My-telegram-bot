@@ -876,41 +876,48 @@ async def back_to_add_balance(call: types.CallbackQuery):
     )
     await call.answer()
     
-@router.callback_query(lambda c: c.data.startswith("select_plan_"))
+@router.callback_query(F.data.startswith("select_plan_"))
 async def process_select_plan(call: types.CallbackQuery, state: FSMContext):
     user_id = call.from_user.id
     current_balance = get_balance(user_id)
-    
-    # यहाँ से प्रोडक्ट और प्लान की डिटेल्स ऑटोमैटिकली फेच करें
+
     data = await state.get_data()
     product_id = data.get("product_id")
-    plan_index = int(call.data.split("_")[2]) 
     
+    plan_name_encoded = call.data.replace("select_plan_", "")
+    plans = plans_db.get(str(product_id), [])
+    
+    plan = next((p for p in plans if p['plan_name'].replace(' ', '_') == plan_name_encoded), None)
+
+    if not plan:
+        await call.answer("Plan not found.")
+        return
+
     product_name = products_db.get(product_id, "Unknown Product")
-    plan = plans_db.get(str(product_id), [])[plan_index]
-    
     plan_name = plan["plan_name"]
     price = plan["price"]
-    
+
     deficit_need = max(0.0, price - current_balance)
-    
+
     text = (
-        "<blockquote><b>💰 INSUFFICIENT BALANCE</b></blockquote>\n\n"
-        f"┣ Product: {product_name}\n"
-        f"┣ Plan: {plan_name}\n"
-        f"┣ Price: ₹{price:.2f}\n"
-        f"┣ Your Balance: ₹{current_balance:.2f}\n"
-        f"┗  Deficit Need: ₹{deficit_need:.2f}\n\n"
-        "Select your preferred gateway option below to proceed:"
+        f"<blockquote><b><i> INSUFFICIENT BALANCE</i></b></blockquote>\n"
+        f"<b> Product: </b>{product_name}\n"
+        f"<b> Plan: </b>{plan_name}\n"
+        f"<b> Price: </b>₹{price:.2f}\n"
+        f"<b> Your Balance: </b>₹{current_balance:.2f}\n"
+        f"<b> Deficit Need: </b>₹{deficit_need:.2f}\n\n"
+        f"Select your preferred gateway option below to proceed:"
     )
-    
-    keyboard = InlineKeyboardMarkup(inline_keyboard=[
-        [InlineKeyboardButton(text="PAY UPI", callback_data=f"pay_upi_{deficit_need}", style="success")],
-        [InlineKeyboardButton(text="Back to Plans", callback_data="back_to_plans", style="danger")]
-    ])
-    
+
+    keyboard = InlineKeyboardMarkup(inline_keyboard=[[
+        InlineKeyboardButton(text="PAY UPI", callback_data=f"pay_upi_{deficit_need}", style="success"),
+        InlineKeyboardButton(text="Back to Plans", callback_data="back_to_plans", style="danger")
+    ]])
+
     await call.message.edit_text(text=text, reply_markup=keyboard, parse_mode="HTML")
     await call.answer()
+
+
 
 
 
