@@ -878,28 +878,40 @@ async def back_to_add_balance(call: types.CallbackQuery):
     await call.answer()
     
 
+
 @router.callback_query(F.data.startswith("select_plan_"))
 async def show_payment_handler(callback_query: CallbackQuery):
-    # डेटाबेस से जानकारी ऑटोमेटिक फेच करने का लॉजिक यहाँ आएगा
-    product_name = "Fetched Product Name"
-    plan_name = "Fetched Plan Name"
-    price = 0.00
-    user_balance = 0.00
+    user_id = callback_query.from_user.id
+    
+    # यूज़र बैलेंस फेच करें
+    user_balance = get_balance(user_id)
+    
+    # कॉल बैक डेटा से प्रोडक्ट आईडी और प्लान निकालें
+    callback_data = callback_query.data.split("_")
+    product_id = callback_data[2]
+    plan_id = callback_data[3]
+    
+    # प्रोडक्ट और प्लान का विवरण फेच करें
+    product_name = products_db.get(product_id, "Unknown Product")
+    plan_info = plans_db.get(plan_id, {"plan_name": "Unknown Plan", "price": 0.0})
+    plan_name = plan_info["plan_name"]
+    price = plan_info["price"]
+    
     deficit = price - user_balance
 
     message_text = (
-        f"<blockquote>INSUFFICIENT BALANCE</blockquote>\n\n"
-        f"Product: {product_name}\n"
-        f"Plan: {plan_name}\n"
-        f"Price: {price}\n"
-        f"Your Balance: {user_balance}\n"
-        f"Deficit Need: {deficit}\n\n"
+        f"<blockquote><b>💰INSUFFICIENT BALANCE </b></blockquote>\n\n"
+        f"┣ Product: {product_name}\n"
+        f"┣ Plan: {plan_name}\n"
+        f"┣ Price: ₹{price:.2f}\n"
+        f"┣ Your Balance: ₹{user_balance:.2f}\n"
+        f"┗ Deficit Need: ₹{deficit:.2f}\n\n"
         f"Select your preferred gateway option below to proceed:"
     )
 
     keyboard = InlineKeyboardMarkup(inline_keyboard=[
-        [InlineKeyboardButton(text="PAY UPI", callback_data="pay_upi")],
-        [InlineKeyboardButton(text="Back to Plans", callback_data="back_to_plans")]
+        [InlineKeyboardButton(text="PAY UPI", callback_data="pay_upi", style="success")],
+        [InlineKeyboardButton(text="Back to Plans", callback_data="back_to_plans", style="danger")]
     ])
 
     await callback_query.message.edit_text(
@@ -908,8 +920,6 @@ async def show_payment_handler(callback_query: CallbackQuery):
         parse_mode="HTML"
     )
     await callback_query.answer()
-
-
 
 
 
