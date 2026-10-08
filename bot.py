@@ -219,18 +219,20 @@ def update_kb():
 async def process_check_update(call: types.CallbackQuery):
     await call.answer()
 
-    update_text = (
-        '<blockquote>📢 Follow our updates channel!  ❞</blockquote>\n\n'
-        '<a href="https://t.me/Sahilbhaialupdate">'
-        '<b>🔗 Click Here For Setup & Updates</b>'
-        '</a>'
+    channel_link = "https://t.me/Sahilbhaiallupdate"
+
+    text = (
+        '<blockquote>📢 Follow our updates channel: </blockquote>\n\n'
+        f'🔗 <a href="https://t.me/Sahilbhaiallupdate"><b>Click Here For Setup & Updates</b></a>\n\n'
+        f'{channel_link}'
     )
 
     await call.message.edit_text(
-        text=update_text,
+        text=text,
         parse_mode="HTML",
         link_preview_options=types.LinkPreviewOptions(
             is_disabled=False,
+            url=channel_link,
             prefer_small_media=True,
             show_above_text=False
         )
