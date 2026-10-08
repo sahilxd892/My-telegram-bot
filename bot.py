@@ -878,6 +878,7 @@ async def back_to_add_balance(call: types.CallbackQuery):
     
 @router.callback_query(F.data.startswith("select_plan_"))
 async def process_select_plan(call: types.CallbackQuery, state: FSMContext):
+    print(f"Callback data received: {call.data}")
     user_id = call.from_user.id
     current_balance = get_balance(user_id)
 
