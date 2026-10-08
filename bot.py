@@ -886,41 +886,47 @@ async def show_payment_handler(callback_query: CallbackQuery):
     # यूज़र बैलेंस फेच करें
     user_balance = get_balance(user_id)
     
-    # कॉल बैक डेटा से प्रोडक्ट आईडी और प्लान निकालें
     callback_data = callback_query.data.split("_")
-    product_id = callback_data[2]
-    plan_id = callback_data[3]
     
-    # प्रोडक्ट और प्लान का विवरण फेच करें
-    product_name = products_db.get(product_id, "Unknown Product")
-    plan_info = plans_db.get(plan_id, {"plan_name": "Unknown Plan", "price": 0.0})
-    plan_name = plan_info["plan_name"]
-    price = plan_info["price"]
-    
-    deficit = price - user_balance
+    # चेक करें कि कॉल बैक डेटा सही फॉर्मेट में है
+    if len(callback_data) >= 4 and callback_data[0] == "select" and callback_data[1] == "plan":
+        product_id = callback_data[2]
+        plan_id = callback_data[3]
+        
+        # प्रोडक्ट और प्लान का विवरण फेच करें
+        product_name = products_db.get(product_id, "Unknown Product")
+        plan_info = plans_db.get(plan_id, {"plan_name": "Unknown Plan", "price": 0.0})
+        plan_name = plan_info["plan_name"]
+        price = plan_info["price"]
+        
+        deficit = price - user_balance
 
-    message_text = (
-        f"<blockquote><b>💰INSUFFICIENT BALANCE </b></blockquote>\n\n"
-        f"┣ Product: {product_name}\n"
-        f"┣ Plan: {plan_name}\n"
-        f"┣ Price: ₹{price:.2f}\n"
-        f"┣ Your Balance: ₹{user_balance:.2f}\n"
-        f"┗ Deficit Need: ₹{deficit:.2f}\n\n"
-        f"Select your preferred gateway option below to proceed:"
-    )
+        message_text = (
+            f"<blockquote><b>INSUFFICIENT BALANCE </b></blockquote>\n\n"
+            f"👤 Product: {product_name}\n"
+            f"📅 Plan: {plan_name}\n"
+            f"💰 Price: ₹{price:.2f}\n"
+            f"💳 Your Balance: ₹{user_balance:.2f}\n"
+            f"📉 Deficit Need: ₹{deficit:.2f}\n\n"
+            f"Select your preferred gateway option below to proceed:"
+        )
 
-    keyboard = InlineKeyboardMarkup(inline_keyboard=[
-        [InlineKeyboardButton(text="PAY UPI", callback_data="pay_upi", style="success")],
-        [InlineKeyboardButton(text="Back to Plans", callback_data="back_to_plans", style="danger")]
-    ])
+        keyboard = InlineKeyboardMarkup(inline_keyboard=[
+            [InlineKeyboardButton(text="PAY UPI", callback_data="pay_upi", style="success")],
+            [InlineKeyboardButton(text="Back to Plans", callback_data="back_to_plans", style="danger")]
+        ])
 
-    await callback_query.message.edit_text(
-        text=message_text,
-        reply_markup=keyboard,
-        parse_mode="HTML"
-    )
-    await callback_query.answer()
-
+        await callback_query.message.edit_text(
+            text=message_text,
+            reply_markup=keyboard,
+            parse_mode="HTML"
+        )
+        await callback_query.answer()
+        
+    else:
+        # अगर डेटा सही फॉर्मेट में नहीं है, तो एरर हैंडल करें
+        await callback_query.answer("Invalid callback data", show_alert=True)
+        return
 
 
 if __name__ == '__main__':
