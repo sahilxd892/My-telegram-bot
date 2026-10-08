@@ -7,7 +7,6 @@ from typing import Optional
 from aiogram import Bot, Dispatcher, types
 from aiogram.filters import Command
 from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
-from aiogram.types import LinkPreviewOptions
 from aiogram import F
 import qrcode
 from aiogram.fsm.state import State, StatesGroup
@@ -222,22 +221,15 @@ def update_kb():
 async def process_check_update(call: types.CallbackQuery):
     await call.answer()
     print("Check Update button pressed")
-    
     update_text = (
-        "<blockquote>📢 Follow our updates channel:\n\n"
-        "🔗 <a href='https://t.me/Sahilbhaiallupdate'><b>Click Here For Setup & Updates</b></a></blockquote>"
+        "<blockquote>📢 Follow our updates channel:</blockquote>\n"
+        "🔗 <a href='https://t.me/Sahilbhaiallupdate'><b> Click Here For Setup & Updates</b></a>"
     )
     
     await call.message.edit_text(
         text=update_text,
         parse_mode="HTML",
-        reply_markup=update_kb(),
-        link_preview_options=LinkPreviewOptions(
-            is_disabled=False,
-            url="https://t.me/Sahilbhaiallupdate",
-            prefer_small_media=True,
-            show_above_text=False
-        )
+        reply_markup=update_kb()
     )
 
 
