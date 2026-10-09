@@ -1052,7 +1052,7 @@ async def back_to_plans_handler(call: types.CallbackQuery):
 @router.callback_query(lambda c: c.data.startswith("verify_payment"))
 async def verify_payment_handler(callback_query: types.CallbackQuery):
     user_id = callback_query.from_user.id
-
+    print("verify  Payment button clicked")
     # ईमेल चेक करके बैलेंस अपडेट करने का फंक्शन कॉल करें
     process_payments(user_id)
 
