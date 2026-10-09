@@ -1005,7 +1005,7 @@ async def show_payment_handler(callback_query: CallbackQuery):
     )
 
     keyboard = InlineKeyboardMarkup(inline_keyboard=[
-        [InlineKeyboardButton(text="PAY UPI", callback_data=f"pay_upi_{price}", style="success")],
+        [InlineKeyboardButton(text="PAY UPI", callback_data=f"pay_upi_{deficit}", style="success")],
         [InlineKeyboardButton(text="Back to Plans", callback_data=f"back_to_plans_{product_id}", style="danger")]
     ])
 
@@ -1049,17 +1049,7 @@ async def back_to_plans_handler(call: types.CallbackQuery):
     await call.answer()
 
 
-@router.callback_query(lambda c: c.data.startswith("verify_payment"))
-async def verify_payment_handler(callback_query: types.CallbackQuery):
-    print("Verify Payment button clicked")
-    user_id = callback_query.from_user.id
-    
-    payment_status = process_payments(user_id)
-    
-    if payment_status:
-        await callback_query.answer(text="Payment successful!", show_alert=True)
-    else:
-        await callback_query.answer(text="Payment not on net.", show_alert=True)
+
 
 
 
