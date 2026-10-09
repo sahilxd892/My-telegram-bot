@@ -916,7 +916,7 @@ async def show_payment_handler(callback_query: CallbackQuery):
         
 @router.callback_query(F.data.startswith("back_to_plans_"))
 async def back_to_plans_handler(call: types.CallbackQuery):
-    product_id = call.data.split("_")[3]
+    product_id = call.data.split("_")[2]
     plans = plans_db.get(product_id, [])
     
     keyboard_buttons = []
