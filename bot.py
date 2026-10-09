@@ -885,6 +885,7 @@ async def show_payment_handler(callback_query: CallbackQuery):
     product_id = callback_query.data.split("_")[2]
     product_name = products_db.get(product_id, "Unknown Product")
     plans = get_plans_for_product(product_id)
+    plan_name = ", ".join([plan['plan_name'] for plan in plans])
     price = 0.00
     user_balance = get_balance(callback_query.from_user.id)
     deficit = max(0, price - user_balance)
