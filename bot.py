@@ -16,6 +16,63 @@ from aiogram import types
 from aiogram import F, Router, types
 import aiohttp
 from aiogram.types import CallbackQuery
+import imaplib
+import email
+from email.header import decode_header
+import re
+from datetime import datetime
+
+def check_payments():
+    IMAP_SERVER = 'imap.gmail.com'
+    EMAIL_USER = 'sahilxd892@gmail.com'
+    EMAIL_PASS = 'zedhnmlzzzhmpfus'
+    
+    payment_details = []
+    
+    try:
+        mail = imaplib.IMAP4_SSL(IMAP_SERVER)
+        mail.login(EMAIL_USER, EMAIL_PASS)
+        mail.select('inbox')
+        
+        status, messages = mail.search(None, '(UNSEEN)')
+        
+        for num in messages[0].split():
+            status, data = mail.fetch(num, '(RFC822)')
+            msg = email.message_from_bytes(data[0][1])
+            
+            body = ""
+            if msg.is_multipart():
+                for part in msg.walk():
+                    if part.get_content_type() == "text/plain":
+                        body = part.get_payload(decode=True).decode()
+            else:
+                body = msg.get_payload(decode=True).decode()
+                
+            if "successful" in body.lower():
+                amount_match = re.search(r'(?:R[sS]|INR|₹)\s?0*(\d+(?:\.\d+)?)', body)
+                tx_match = re.search(r'(?:Transaction\s?ID|UTR)[:\s]+([A-Za-z0-9]+)', body, re.IGNORECASE)
+                date_match = re.search(r'Date[:\s]+([\w\s,:]+)', body, re.IGNORECASE)
+                
+                if amount_match and tx_match:
+                    amount = float(amount_match.group(1))
+                    tx_id = tx_match.group(1)
+                    date_str = date_match.group(1) if date_match else datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+                    
+                    payment_details.append({
+                        'amount': amount,
+                        'tx_id': tx_id,
+                        'date': date_str
+                    })
+                    print(f"Payment detected: {amount} for TXN {tx_id} at {date_str}")
+                    
+                    mail.store(num, '+FLAGS', '\\Seen')
+                    
+        mail.close()
+        mail.logout()
+        return payment_details
+    except Exception as e:
+        print(f"Error checking emails: {e}")
+        return None
 
 def init_db():
     conn = sqlite3.connect("products.db")
@@ -45,11 +102,11 @@ def update_balance(user_id, amount):
 
 products_db = {
     "62": "DRIP CLIENT NON ROOT",
-    "54": "PATO TEAM FF ALL",
+    "54": "PATO TEAM APK MOD",
     "48": "PRIME HOOK APK-MOD",
     "127": "SILENT CHEAT NON ROOT",
     "133": "AIM HACK NON ROOT ",
-    "150": "DRIP CLIENT WIRE NON ROOT ",
+    "150": "DRIP CLIENT WIRE APK MOD",
     "136": "BALA MOD APK MOD",
     "155": "XYZ CHEATS NON ROOT",
     "159": "ZRAX PANEL NON ROOT",
@@ -85,6 +142,13 @@ def init_db():
             balance REAL DEFAULT 0.0
         )
     """)
+        cursor.execute('''
+        CREATE TABLE IF NOT EXISTS transactions (
+            tx_id TEXT PRIMARY KEY,
+            amount REAL,
+            date TEXT
+        )
+    ''')
 
     cursor.execute("""
     CREATE TABLE IF NOT EXISTS daily_spin (
@@ -104,6 +168,44 @@ def update_balance(user_id: int, amount: float):
         ON CONFLICT(user_id) DO UPDATE SET balance = balance + ?
     """, (user_id, amount, amount))
     conn.commit()
+    conn.close()
+
+def save_transaction(tx_id, amount, date):
+    conn = sqlite3.connect("products.db")
+    cursor = conn.cursor()
+    cursor.execute(
+        "INSERT INTO transactions (tx_id, amount, date) VALUES (?, ?, ?)",
+        (tx_id, amount, date),
+    )
+    conn.commit()
+    conn.close()
+
+def process_payments(user_id):
+    payments = check_payments()
+    if not payments:
+        print("No new payments found.")
+        return
+
+    conn = sqlite3.connect("products.db")
+    cursor = conn.cursor()
+
+    for pay in payments:
+        tx_id = pay["tx_id"]
+        amount = pay["amount"]
+        date = pay["date"]
+
+        cursor.execute(
+            "SELECT tx_id FROM transactions WHERE tx_id = ?", (tx_id,)
+        )
+        if cursor.fetchone() is None:
+            update_balance(user_id, amount)
+            save_transaction(tx_id, amount, date)
+            print(
+                f"Balance updated and transaction {tx_id} saved for user {user_id}."
+            )
+        else:
+            print(f"Transaction {tx_id} already processed.")
+
     conn.close()
 
 # Balance fetch karne ka function
@@ -946,6 +1048,26 @@ async def back_to_plans_handler(call: types.CallbackQuery):
     await call.message.edit_text(text=message_text, reply_markup=keyboard, parse_mode="HTML")
     await call.answer()
 
+@router.callback_query(lambda c: c.data == "verify_payment")
+async def verify_payment_handler(callback_query: types.CallbackQuery):
+    user_id = callback_query.from_user.id
+    
+    # ईमेल चेक करके बैलेंस अपडेट करने का फंक्शन कॉल करें
+    process_payments(user_id)
+    
+    # यहाँ आपको यह तर्क जोड़ना होगा कि पेमेंट सफल रही या नहीं
+    # अगर पेमेंट मिल जाती है:
+    payment_status = True # उदाहरण के लिए
+    
+    if payment_status:
+        await callback_query.answer(
+            text="Payment successful!", show_alert=True
+        )
+        # यहाँ पेमेंट सक्सेस होने पर अतिरिक्त एक्शन ले सकते हैं
+    else:
+        await callback_query.answer(
+            text="👑Payment asset not logged on network yet.", show_alert=True
+        )
 
 
 
