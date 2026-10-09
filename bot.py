@@ -902,7 +902,7 @@ async def show_payment_handler(callback_query: CallbackQuery):
     )
 
     keyboard = InlineKeyboardMarkup(inline_keyboard=[
-        [InlineKeyboardButton(text="PAY UPI", callback_data="pay_upii", style="success")],
+        [InlineKeyboardButton(text="PAY UPI", callback_data="pay_upi_{final_amount}", style="success")],
         [InlineKeyboardButton(text="Back to Plans", callback_data="back_to_plans", style="danger")]
     ])
 
@@ -914,10 +914,10 @@ async def show_payment_handler(callback_query: CallbackQuery):
     await callback_query.answer()
         
 
-@router.callback_query(F.data.startswith("pay_upii"))
+@router.callback_query(F.data.startswith("pay_upi_{final_amount}"))
 async def process_pay_upi(callback_query: types.CallbackQuery, state: FSMContext):
     await callback_query.message.delete()
-    amount = float(callback_query.data.split("_")[2])
+    amount = float(callback_query.data.rsplit('_', 1)[1])
     upi_id = "sahilsk892@fam"  # Apni UPI ID yahan dalein
     upi_link = f"upi://pay?pa={upi_id}&am={amount}&cu=INR"
     
