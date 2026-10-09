@@ -893,14 +893,14 @@ async def show_payment_handler(callback_query: CallbackQuery):
         f"<blockquote>💰INSUFFICIENT BALANCE</blockquote>\n\n"
         f"┣Product: {product_name}\n"
         f"┣Plan: {plan_name}\n"
-        f"┣Price: {price}\n"
+        f"┣Price: 🪙₹{price:.2f}\n"
         f"┣Your Balance: 🪙₹{user_balance:.2f}\n"
-        f"┗Deficit Need: {deficit}\n\n"
+        f"┗Deficit Need: 🪙₹{deficit:.2f}\n\n"
         f"Select your preferred gateway option below to proceed:"
     )
 
     keyboard = InlineKeyboardMarkup(inline_keyboard=[
-        [InlineKeyboardButton(text="PAY UPI", callback_data="pay_upi_{amount}", style="success")],
+        [InlineKeyboardButton(text="PAY UPI", callback_data="pay_upi_qr", style="success")],
         [InlineKeyboardButton(text="Back to Plans", callback_data="back_to_plans", style="danger")]
     ])
 
