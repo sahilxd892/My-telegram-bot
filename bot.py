@@ -914,6 +914,21 @@ async def show_payment_handler(callback_query: CallbackQuery):
     )
     await callback_query.answer()
         
+@router.callback_query(F.data.startswith("back_to_plans"))
+async def back_to_plans_handler(call: types.CallbackQuery):
+    product_id = call.data.split("_")[3]
+    plans = plans_db.get(product_id, [])
+    
+    keyboard_buttons = []
+    for plan in plans:
+        plan_name = plan['plan_name']
+        price = plan['price']
+        callback_data = f"select_plan_{product_id}_{plan_name.replace(' ', '_')}"
+        keyboard_buttons.append([types.InlineKeyboardButton(text=f"{plan_name} - ₹{price}", callback_data=callback_data)])
+        
+    keyboard = types.InlineKeyboardMarkup(inline_keyboard=keyboard_buttons)
+    await call.message.edit_text(text="Choose your access plan:", reply_markup=keyboard)
+    await call.answer()
 
 
 
