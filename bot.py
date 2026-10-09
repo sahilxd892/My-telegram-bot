@@ -903,7 +903,7 @@ async def show_payment_handler(callback_query: CallbackQuery):
     )
 
     keyboard = InlineKeyboardMarkup(inline_keyboard=[
-        [InlineKeyboardButton(text="PAY UPI", callback_data="pay_upi", style="success")],
+        [InlineKeyboardButton(text="PAY UPI", callback_data="pay_upi_", style="success")],
         [InlineKeyboardButton(text="Back to Plans", callback_data=f"back_to_plans_{product_id}", style="danger")]
     ])
 
@@ -939,7 +939,7 @@ async def back_to_plans_handler(call: types.CallbackQuery):
     message_text = (
         f"<blockquote>🛒{product_name}</blockquote>\n"
         f"<blockquote>👤 Your Account Tier: 👥 USER</blockquote>\n"
-        f"<blockquote>🛍️ Choose your access plan:</blockquote>\n"
+        f"<blockquote>🛍️ Choose your access plan:</blockquote>\n\n"
         f"{plans_text}"
     )
     
