@@ -902,7 +902,7 @@ async def show_payment_handler(callback_query: CallbackQuery):
     )
 
     keyboard = InlineKeyboardMarkup(inline_keyboard=[
-        [InlineKeyboardButton(text="PAY UPI", callback_data="pay_upi_qr", style="success")],
+        [InlineKeyboardButton(text="PAY UPI", callback_data="pay_upii", style="success")],
         [InlineKeyboardButton(text="Back to Plans", callback_data="back_to_plans", style="danger")]
     ])
 
@@ -914,6 +914,61 @@ async def show_payment_handler(callback_query: CallbackQuery):
     await callback_query.answer()
         
 
+@router.callback_query(F.data.startswith("pay_upii"))
+async def process_pay_upi(callback_query: types.CallbackQuery, state: FSMContext):
+    await callback_query.message.delete()
+    amount = float(callback_query.data.split("_")[2])
+    upi_id = "sahilsk892@fam"  # Apni UPI ID yahan dalein
+    upi_link = f"upi://pay?pa={upi_id}&am={amount}&cu=INR"
+    
+    qr = qrcode.QRCode(
+    version=None,
+    error_correction=qrcode.constants.ERROR_CORRECT_L,
+    box_size=10,
+    border=4,
+)
+    qr.add_data(upi_link)
+    qr.make(fit=True)
+    img = qr.make_image(fill_color="black", back_color="white")
+
+    buffer = BytesIO()
+    img.save(buffer, format="PNG")
+    buffer.seek(0)
+
+
+    markup = types.InlineKeyboardMarkup(
+        inline_keyboard=[
+            [
+                types.InlineKeyboardButton(
+                    text="VERIFY PAYMENT",
+                    callback_data=f"verify_paymenti",
+                    style="success",
+                )
+            ],
+            [
+                types.InlineKeyboardButton(
+                    text="Cancel Order",
+                    callback_data="cancel_order",
+                    style="danger",
+                )
+            ],
+        ]
+    )
+
+    caption_text = (
+        "<blockquote><b>📶SAHIL BHAI STORE UPI QR Active</b></blockquote>\n\n"
+        f"Scan & transfer exactly 🪙₹{amount:.2f} via your UPI app terminal.\n\n"
+        f"Tap verify below after completing the core transaction transfer.\n\n"
+        "<blockquote><b>⏳QR Session TTL: expires in 5 minutes.</b></blockquote>"
+    )
+
+    await callback_query.message.answer_photo(
+        types.BufferedInputFile(buffer.getvalue(), filename="qr.png"),
+        caption=caption_text,
+        parse_mode="HTML",
+        reply_markup=markup,
+    )
+    await callback_query.answer()
 
 if __name__ == '__main__':
     init_db()
