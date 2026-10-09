@@ -928,13 +928,18 @@ async def back_to_plans_handler(call: types.CallbackQuery):
         callback_data = f"select_plan_{product_id}_{plan_name.replace(' ', '_')}"
         keyboard_buttons.append([types.InlineKeyboardButton(text=f"{plan_name} - ₹{price}", callback_data=callback_data, style="success")])
     
-    keyboard_buttons.append([types.InlineKeyboardButton(text="Back", callback_data="menu_back", style="danger")])
+    keyboard_buttons.append([types.InlineKeyboardButton(text="Back", callback_data="menu_shop", style="danger")])
     keyboard = types.InlineKeyboardMarkup(inline_keyboard=keyboard_buttons)
 
+    plans_text = ""
+    for plan in plans:
+        plans_text += f"• {plan['plan_name']} - ₹{plan['price']}\n"
+
     message_text = (
-        f"<blockquote>{product_name}</blockquote>\n\n"
-        f"<blockquote>👤 Your Account Tier: 👥 USER</blockquote>\n\n"
-        f"<blockquote>🛒 Choose your access plan:</blockquote>"
+        f"<blockquote>🛒 Product: {product_name}</blockquote>\n"
+        f"<blockquote>👤 Your Account Tier: 👥 USER</blockquote>\n"
+        f"<blockquote>🛍️ Choose your access plan:</blockquote>\n"
+        f"{plans_text}"
     )
     
     await call.message.edit_text(text=message_text, reply_markup=keyboard, parse_mode="HTML")
