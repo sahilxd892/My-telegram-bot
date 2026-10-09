@@ -884,7 +884,7 @@ async def show_payment_handler(callback_query: CallbackQuery):
     # डेटाबेस से जानकारी ऑटोमेटिक फेच करने का लॉजिक यहाँ आएगा
     product_id = callback_query.data.split("_")[2]
     product_name = products_db.get(product_id, "Unknown Product")
-    plans = [plans_db.get(product_id)]
+    plans = plans_db.get(product_id)
     plan_name = ", ".join([plan['plan_name'] for plan in plans])
     price = 0.00
     user_balance = get_balance(callback_query.from_user.id)
