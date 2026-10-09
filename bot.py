@@ -1049,6 +1049,14 @@ async def back_to_plans_handler(call: types.CallbackQuery):
     await call.answer()
 
 
+@router.callback_query(F.data.startswith("verify_payment_"))
+async def verify_payment_handler(call: types.CallbackQuery):
+    user_id = call.from_user.id
+    payment_status = process_payments(user_id)
+    if payment_status:
+        await call.answer(text="Payment Successful!", show_alert=True)
+    else:
+        await call.answer(text="Payment Not Lock On Network Yet", show_alert=True)
 
 
 
