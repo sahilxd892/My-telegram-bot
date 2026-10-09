@@ -1051,22 +1051,16 @@ async def back_to_plans_handler(call: types.CallbackQuery):
 
 @router.callback_query(lambda c: c.data.startswith("verify_payment"))
 async def verify_payment_handler(callback_query: types.CallbackQuery):
+    print("Verify Payment button clicked")
     user_id = callback_query.from_user.id
-    print("verify  Payment button clicked")
-    # ईमेल चेक करके बैलेंस अपडेट करने का फंक्शन कॉल करें
-    process_payments(user_id)
-
-    # यह जाँचने के लिए कि भुगतान सफल रहा या नहीं
-    payment_status = True # उदाहरण के लिए
-
+    
+    payment_status = process_payments(user_id)
+    
     if payment_status:
-        await callback_query.answer(
-            text="Payment successful!", show_alert=True
-        )
+        await callback_query.answer(text="Payment successful!", show_alert=True)
     else:
-        await callback_query.answer(
-            text="👑Payment asset not logged on network yet.", show_alert=True
-        )
+        await callback_query.answer(text="Payment not on net.", show_alert=True)
+
 
 
 
