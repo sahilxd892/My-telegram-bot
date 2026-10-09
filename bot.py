@@ -918,18 +918,28 @@ async def show_payment_handler(callback_query: CallbackQuery):
 async def back_to_plans_handler(call: types.CallbackQuery):
     print(f"Callback data: {call.data}")
     product_id = call.data.split("_")[3]
+    product_name = products_db.get(product_id, "Unknown Product")
     plans = plans_db.get(product_id, [])
-    
+
     keyboard_buttons = []
     for plan in plans:
         plan_name = plan['plan_name']
         price = plan['price']
         callback_data = f"select_plan_{product_id}_{plan_name.replace(' ', '_')}"
-        keyboard_buttons.append([types.InlineKeyboardButton(text=f"{plan_name} - ₹{price}", callback_data=callback_data)])
-        
+        keyboard_buttons.append([types.InlineKeyboardButton(text=f"{plan_name} - ₹{price}", callback_data=callback_data, style="success")])
+    
+    keyboard_buttons.append([types.InlineKeyboardButton(text="Back", callback_data="menu_back", style="danger")])
     keyboard = types.InlineKeyboardMarkup(inline_keyboard=keyboard_buttons)
-    await call.message.edit_text(text="Choose your access plan:", reply_markup=keyboard)
+
+    message_text = (
+        f"<blockquote>{product_name}</blockquote>\n\n"
+        f"<blockquote>👤 Your Account Tier: 👥 USER</blockquote>\n\n"
+        f"<blockquote>🛒 Choose your access plan:</blockquote>"
+    )
+    
+    await call.message.edit_text(text=message_text, reply_markup=keyboard, parse_mode="HTML")
     await call.answer()
+
 
 
 
