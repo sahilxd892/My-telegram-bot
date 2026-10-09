@@ -933,10 +933,11 @@ async def back_to_plans_handler(call: types.CallbackQuery):
 
     plans_text = ""
     for plan in plans:
-        plans_text += f"• {plan['plan_name']} - ₹{plan['price']}\n"
+        plans_text += f"┝🪙₹{plan['price']:.2f} — ⏳{plan['plan_name']}\n"
+
 
     message_text = (
-        f"<blockquote>🛒 Product: {product_name}</blockquote>\n"
+        f"<blockquote>🛒{product_name}</blockquote>\n"
         f"<blockquote>👤 Your Account Tier: 👥 USER</blockquote>\n"
         f"<blockquote>🛍️ Choose your access plan:</blockquote>\n"
         f"{plans_text}"
