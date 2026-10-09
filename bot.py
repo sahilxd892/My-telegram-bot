@@ -618,7 +618,7 @@ async def process_pay_upi(callback_query: types.CallbackQuery, state: FSMContext
 
     caption_text = (
         "<blockquote><b>📶SAHIL BHAI STORE UPI QR Active</b></blockquote>\n\n"
-        f"Scan & transfer exactly 🪙₹{amount:.2f} via your UPI app terminal.\n\n"
+        f"Scan & transfer exactly 🪙₹<b>{amount:.2f}</b> via your UPI app terminal.\n\n"
         f"Tap verify below after completing the core transaction transfer.\n\n"
         "<blockquote><b>⏳QR Session TTL: expires in 5 minutes.</b></blockquote>"
     )
@@ -1056,7 +1056,7 @@ async def verify_payment_handler(call: types.CallbackQuery):
     if payment_status:
         await call.answer(text="Payment Successful!", show_alert=True)
     else:
-        await call.answer(text="Payment Not Lock On Network Yet", show_alert=True)
+        await call.answer(text="👑Payment asset not logged on network yet.", show_alert=True)
 
 
 
