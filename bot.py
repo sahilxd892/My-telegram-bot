@@ -44,18 +44,18 @@ def update_balance(user_id, amount):
 
 
 products_db = {
-    "62": "DRIP CLIENT FF NON ROOT",
+    "62": "DRIP CLIENT NON ROOT",
     "54": "PATO TEAM FF ALL",
-    "48": "PRIME HOOK FF NON ROOT",
-    "127": "SILENT CHEAT FF NON ROOT",
+    "48": "PRIME HOOK APK-MOD",
+    "127": "SILENT CHEAT NON ROOT",
     "133": "AIM HACK NON ROOT ",
     "150": "DRIP CLIENT WIRE NON ROOT ",
-    "136": "BALA MODS NON ROOT ",
+    "136": "BALA MOD APK MOD",
     "155": "XYZ CHEATS NON ROOT",
     "159": "ZRAX PANEL NON ROOT",
     "151": "ABCD PANEL NON ROOT",
-    "66": "XYZ CHEATS FF ROOT",
-    "155": "XYZ CHEATS FF NON ROOT",
+    "66": "XYZ CHEATS ROOT",
+    "155": "XYZ CHEATS NON ROOT",
     "63": "DRIP CLIENT ROOT",
     "166": "TROLL MODZ NON ROOT",
 }
