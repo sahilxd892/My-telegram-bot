@@ -142,7 +142,7 @@ def init_db():
             balance REAL DEFAULT 0.0
         )
     """)
-        cursor.execute('''
+    cursor.execute('''
         CREATE TABLE IF NOT EXISTS transactions (
             tx_id TEXT PRIMARY KEY,
             amount REAL,
