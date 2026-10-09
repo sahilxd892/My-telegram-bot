@@ -660,7 +660,7 @@ async def process_buy_product(call: types.CallbackQuery):
             [
                 types.InlineKeyboardButton(
                     text=f"{plan['plan_name']} - ₹{plan['price']}",
-                    callback_data=f'select_plan_{product_id}_{plan["plan_name"]}',
+                    callback_data=f"select_plan_{product_id}_{plan['plan_name'].replace(' ', '_')}",
                     style="success",
                 )
             ]
@@ -886,7 +886,7 @@ async def show_payment_handler(callback_query: CallbackQuery):
     product_name = products_db.get(product_id, "Unknown Product")
     plans = plans_db.get(product_id, [])
     print(f"Product ID: {product_id}, Plans: {plans}")
-    plan_name = callback_query.data.rsplit('_', 1)[1]
+    plan_name = callback_query.data.rsplit('_', 1)[1].replace('_', ' ')
     plan_name = ", ".join([plan['plan_name'] for plan in plans])
     price = 0.00
     user_balance = get_balance(callback_query.from_user.id)
