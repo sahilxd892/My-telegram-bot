@@ -102,7 +102,7 @@ def update_balance(user_id: int, amount: float):
     cursor = conn.cursor()
     cursor.execute("""
         INSERT INTO users (user_id, balance) VALUES (?, ?)
-        ON CONFLICT(user_id) DO UPDATE SET balance = balance + ?
+        ON CONFLICT(user_id) DO UPDATE SET balance = ?
     """, (user_id, amount, amount))
     conn.commit()
     conn.close()
