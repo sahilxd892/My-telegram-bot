@@ -226,8 +226,8 @@ async def process_check_update(call: types.CallbackQuery):
     await call.answer()
     print("Check Update button pressed")
     update_text = (
-        "<blockquote>ðŸ“¢ Follow our updates channel:</blockquote>\n"
-        "ðŸ”— <a href='https://t.me/Sahilbhaiallupdate'><b> Click Here For Setup & Updates</b></a>"
+        "<blockquote>📢Follow our updates channel:</blockquote>\n"
+        "🔗<a href='https://t.me/Sahilbhaiallupdate'><b> Click Here For Setup & Updates</b></a>"
     )
     
     await call.message.edit_text(
