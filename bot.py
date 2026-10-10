@@ -731,7 +731,7 @@ async def spin_now(call: types.CallbackQuery):
         amount = status_result["amount"]
         current_balance = get_balance(user_id)
         new_balance = current_balance + amount
-        update_balance(user_id, amount)
+        update_balance(user_id, new_balance)
         
         text = (f"<blockquote><b>🎁  Daily Gift Spin Winner! </b></blockquote>\n\n"
                 f"You won a randomized claim of: <b>🪙₹{amount}</b>\n\n"
