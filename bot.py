@@ -224,40 +224,17 @@ def update_kb():
 @dp.callback_query(F.data == "menu_check_update")
 async def process_check_update(call: types.CallbackQuery):
     await call.answer()
-
-    channel_link = "https://t.me/Sahilbhaialupdate"
-    channel_name = "Sahil Bhai All Update"
-    channel_photo = "AgACAgUAAxkBAAFV03dqyf-RaiFVvffauboBH3olmlIiwACZxZrG3qAUFacQoAtWl3JgAEAAwIAA3MAAz0E"
-
-    channel_description = (
-        "🙏 Focus On Lawda Lahsun\n"
-        "━━━━━━━━━━━━━━━━━━\n"
-        "Owner :- @SAHILXD78"
-    )
-
+    print("Check Update button pressed")
     update_text = (
-        "📥 <b>Follow our updates channel:</b>\n\n"
-        "🔗 <a href='https://t.me/Sahilbhaialupdate'>"
-        "<b>Click Here For Setup &amp; Updates</b></a>\n\n"
-        "━━━━━━━━━━━━━━━━━━\n"
-        "📱 <b><a href='https://t.me/Sahilbhaialupdate'>Telegram</a></b>\n"
-        f"<b><a href='{channel_link}'>{channel_name}</a></b>\n\n"
-        f"<a href='{channel_link}'>{channel_description}</a>\n\n"
-        "〰️〰️〰️〰️〰️〰️〰️〰️\n"
-        f"<b><a href='{channel_link}'> VIEW CHANNEL</a></b>"
+        "<blockquote>ðŸ“¢ Follow our updates channel:</blockquote>\n"
+        "ðŸ”— <a href='https://t.me/Sahilbhaiallupdate'><b> Click Here For Setup & Updates</b></a>"
     )
-
-    try:
-        await call.message.answer_photo(
-            photo=channel_photo,
-            caption=update_text,
-            parse_mode="HTML",
-            reply_markup=update_kb()
-        )
-    except Exception as e:
-        await call.message.answer(
-            f"Update page error: {str(e)[:300]}"
-        )
+    
+    await call.message.edit_text(
+        text=update_text,
+        parse_mode="HTML",
+        reply_markup=update_kb()
+    )
 
 
 
