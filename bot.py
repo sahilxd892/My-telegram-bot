@@ -227,7 +227,7 @@ async def process_check_update(call: types.CallbackQuery):
 
     channel_link = "https://t.me/Sahilbhaialupdate"
     channel_name = "Sahil Bhai All Update"
-    channel_photo = "YOUR_CHANNEL_PHOTO_FILE_ID"
+    channel_photo = "AgACAgUAAxkBAAFV03dqyf-RaiFVvffauboBH3olmlIiwACZxZrG3qAUFacQoAtWl3JgAEAAwIAA3MAAz0E"
 
     channel_description = (
         "🙏 Focus On Lawda Lahsun\n"
