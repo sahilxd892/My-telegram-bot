@@ -102,7 +102,7 @@ def update_balance(user_id: int, amount: float):
     cursor = conn.cursor()
     cursor.execute("""
         INSERT INTO users (user_id, balance) VALUES (?, ?)
-        ON CONFLICT(user_id) DO UPDATE SET balance = ?
+        ON CONFLICT(user_id) DO UPDATE SET balance = balance + ?
     """, (user_id, amount, amount))
     conn.commit()
     conn.close()
@@ -703,7 +703,7 @@ async def process_buy_product(call: types.CallbackQuery):
 import random
 
 def process_spin(user_id):
-    current_time = int(time.time())
+    current_time = time.time()
     conn = sqlite3.connect("products.db")
     cursor = conn.cursor()
     cursor.execute("SELECT last_spin_time FROM daily_spin WHERE user_id = ?", (user_id,))
@@ -731,11 +731,11 @@ async def spin_now(call: types.CallbackQuery):
         amount = status_result["amount"]
         current_balance = get_balance(user_id)
         new_balance = current_balance + amount
-        update_balance(user_id, new_balance)
+        update_balance(user_id, amount)
         
         text = (f"<blockquote><b>🎁  Daily Gift Spin Winner! </b></blockquote>\n\n"
-                f"You won a randomized claim of: <b>🪙₹{amount}</b>\n\n"
-                f"Updated Wallet: <b>🪙₹{new_balance}</b>")
+                f"You won a randomized claim of: <b>₹{amount}</b>\n\n"
+                f"Updated Wallet: <b>₹{new_balance}</b>")
                 
         keyboard = types.InlineKeyboardMarkup(inline_keyboard=[
             [types.InlineKeyboardButton(text="Back to Menu", callback_data="menu_back", style="danger")]
@@ -958,4 +958,4 @@ async def back_to_plans_handler(call: types.CallbackQuery):
 if __name__ == '__main__':
     init_db()
     dp.include_router(router)
-    asyncio.run(dp.start_polling(bot))
+    asyncio.run(dp.start_polling(bot)) 
