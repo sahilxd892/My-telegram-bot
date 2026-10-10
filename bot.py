@@ -223,38 +223,60 @@ def update_kb():
 @dp.callback_query(F.data == "menu_check_update")
 async def process_check_update(call: types.CallbackQuery):
     await call.answer()
-    print("Check Update button pressed")
 
     channel_link = "https://t.me/Sahilbhaialupdate"
+    channel_name = "Sahil Bhai All Update"
+    channel_photo = "YOUR_CHANNEL_PHOTO_FILE_ID"
+
+    channel_description = (
+        "🙏 Focus On Lawda Lahsun\n"
+        "━━━━━━━━━━━━━━━━━━\n"
+        "Owner :- YOUR_OWNER_USERNAME"
+    )
 
     update_text = (
-        "<blockquote>📢 Follow our updates channel:</blockquote>\n\n"
+        "<blockquote>"
+        "📥 <b>Follow our updates channel:</b>"
+        "</blockquote>\n\n"
 
-        "🔗 <a href='https://t.me/Sahilbhaialupdate'>"
+        "〰️〰️〰️〰️〰️〰️〰️〰️\n"
+
+        "🔗 <a href='" + channel_link + "'>"
         "<b>Click Here For Setup &amp; Updates</b>"
         "</a>\n\n"
 
         "<blockquote>"
-        "<a href='https://t.me/Sahilbhaialupdate'>"
-        "<b>Telegram</b>\n"
-        "<b>Banti Bhaiya All Update</b>\n"
-        "🙏 Focus On Lawda Lahsun\n"
-        "━━━━━━━━━━━━━━━━━━\n"
-        "Owner :- @BANTIBHAIYA69\n"
-        "━━━━━━━━━━━━━━━━━━\n"
-        "Main TG :- @SHIVAMBABYUP51\n"
-        "━━━━━━━━━━━━━━━━━━\n\n"
-        "<b>💗 VIEW CHANNEL</b>"
-        "</a>"
+        "<a href='" + channel_link + "'>"
+        "<b>Telegram</b>"
+        "</a>\n"
+
+        "<a href='" + channel_link + "'>"
+        "<b>" + channel_name + "</b>"
+        "</a>\n"
+
+        "<a href='" + channel_link + "'>"
+        + channel_description +
+        "</a>\n\n"
+
+        "<a href='" + channel_link + "'>"
+        "━━━━━━━━━━━━━━━━━━━━━━━━"
+        "</a>\n\n"
+
+        "<a href='" + channel_link + "'>"
+        "<b> VIEW CHANNEL</b>"
+        "</a>\n"
+
+        "〰️〰️〰️〰️〰️〰️〰️〰️"
         "</blockquote>"
     )
 
-    await call.message.edit_text(
-        text=update_text,
+    await call.message.answer_photo(
+        photo=channel_photo,
+        caption=update_text,
         parse_mode="HTML",
-        reply_markup=update_kb(),
-        disable_web_page_preview=True
+        reply_markup=update_kb()
     )
+
 
 
 
