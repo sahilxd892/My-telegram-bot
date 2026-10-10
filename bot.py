@@ -219,20 +219,43 @@ def update_kb():
     kb.inline_keyboard[0][0].style = "danger"
     return kb
 
+
 @dp.callback_query(F.data == "menu_check_update")
 async def process_check_update(call: types.CallbackQuery):
     await call.answer()
     print("Check Update button pressed")
+
+    channel_link = "https://t.me/Sahilbhaialupdate"
+
     update_text = (
-        "<blockquote>📢 Follow our updates channel:</blockquote>\n"
-        "🔗 <a href='https://t.me/Sahilbhaiallupdate'><b> Click Here For Setup & Updates</b></a>"
+        "<blockquote>📢 Follow our updates channel:</blockquote>\n\n"
+
+        "🔗 <a href='https://t.me/Sahilbhaialupdate'>"
+        "<b>Click Here For Setup &amp; Updates</b>"
+        "</a>\n\n"
+
+        "<blockquote>"
+        "<a href='https://t.me/Sahilbhaialupdate'>"
+        "<b>Telegram</b>\n"
+        "<b>Banti Bhaiya All Update</b>\n"
+        "🙏 Focus On Lawda Lahsun\n"
+        "━━━━━━━━━━━━━━━━━━\n"
+        "Owner :- @BANTIBHAIYA69\n"
+        "━━━━━━━━━━━━━━━━━━\n"
+        "Main TG :- @SHIVAMBABYUP51\n"
+        "━━━━━━━━━━━━━━━━━━\n\n"
+        "<b>💗 VIEW CHANNEL</b>"
+        "</a>"
+        "</blockquote>"
     )
-    
+
     await call.message.edit_text(
         text=update_text,
         parse_mode="HTML",
-        reply_markup=update_kb()
+        reply_markup=update_kb(),
+        disable_web_page_preview=True
     )
+
 
 
 
