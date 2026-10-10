@@ -220,6 +220,7 @@ def update_kb():
     return kb
 
 
+
 @dp.callback_query(F.data == "menu_check_update")
 async def process_check_update(call: types.CallbackQuery):
     await call.answer()
@@ -231,51 +232,33 @@ async def process_check_update(call: types.CallbackQuery):
     channel_description = (
         "🙏 Focus On Lawda Lahsun\n"
         "━━━━━━━━━━━━━━━━━━\n"
-        "Owner :- YOUR_OWNER_USERNAME"
+        "Owner :- @SAHILXD78"
     )
 
     update_text = (
-        "<blockquote>"
-        "📥 <b>Follow our updates channel:</b>"
-        "</blockquote>\n\n"
-
+        "📥 <b>Follow our updates channel:</b>\n\n"
+        "🔗 <a href='https://t.me/Sahilbhaialupdate'>"
+        "<b>Click Here For Setup &amp; Updates</b></a>\n\n"
+        "━━━━━━━━━━━━━━━━━━\n"
+        "📱 <b><a href='https://t.me/Sahilbhaialupdate'>Telegram</a></b>\n"
+        f"<b><a href='{channel_link}'>{channel_name}</a></b>\n\n"
+        f"<a href='{channel_link}'>{channel_description}</a>\n\n"
         "〰️〰️〰️〰️〰️〰️〰️〰️\n"
-
-        "🔗 <a href='" + channel_link + "'>"
-        "<b>Click Here For Setup &amp; Updates</b>"
-        "</a>\n\n"
-
-        "<blockquote>"
-        "<a href='" + channel_link + "'>"
-        "<b>Telegram</b>"
-        "</a>\n"
-
-        "<a href='" + channel_link + "'>"
-        "<b>" + channel_name + "</b>"
-        "</a>\n"
-
-        "<a href='" + channel_link + "'>"
-        + channel_description +
-        "</a>\n\n"
-
-        "<a href='" + channel_link + "'>"
-        "━━━━━━━━━━━━━━━━━━━━━━━━"
-        "</a>\n\n"
-
-        "<a href='" + channel_link + "'>"
-        "<b> VIEW CHANNEL</b>"
-        "</a>\n"
-
-        "〰️〰️〰️〰️〰️〰️〰️〰️"
-        "</blockquote>"
+        f"<b><a href='{channel_link}'> VIEW CHANNEL</a></b>"
     )
 
-    await call.message.answer_photo(
-        photo=channel_photo,
-        caption=update_text,
-        parse_mode="HTML",
-        reply_markup=update_kb()
-    )
+    try:
+        await call.message.answer_photo(
+            photo=channel_photo,
+            caption=update_text,
+            parse_mode="HTML",
+            reply_markup=update_kb()
+        )
+    except Exception as e:
+        await call.message.answer(
+            f"Update page error: {str(e)[:300]}"
+        )
+
 
 
 
