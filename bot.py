@@ -230,14 +230,15 @@ async def process_check_update(call: types.CallbackQuery):
     )
 
     try:
-        await call.message.edit_text(
+        await call.message.answer(
             text=update_text,
             parse_mode="HTML",
             reply_markup=update_kb(),
             disable_web_page_preview=False
         )
     except Exception as e:
-        print(f"Error updating message: {e}")
+        print(f"Error sending message: {e}")
+
 
 
 
