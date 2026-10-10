@@ -703,7 +703,7 @@ async def process_buy_product(call: types.CallbackQuery):
 import random
 
 def process_spin(user_id):
-    current_time = time.time()
+    current_time = int(time.time())
     conn = sqlite3.connect("products.db")
     cursor = conn.cursor()
     cursor.execute("SELECT last_spin_time FROM daily_spin WHERE user_id = ?", (user_id,))
