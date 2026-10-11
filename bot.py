@@ -1002,4 +1002,3 @@ if __name__ == '__main__':
     logging.info("BOT START | DB file: %s | users in DB: %s", DB_PATH, _users)
     dp.include_router(router)
     asyncio.run(dp.start_polling(bot)) 
- 
