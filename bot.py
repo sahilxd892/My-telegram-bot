@@ -1,4 +1,5 @@
 import sqlite3
+from pathlib import Path
 import logging
 from datetime import datetime, timedelta
 import time
@@ -18,8 +19,12 @@ import aiohttp
 from aiogram.types import CallbackQuery
 
 
+# Always use the database beside this script, regardless of the launch directory.
+DB_PATH = Path(__file__).resolve().with_name("products.db")
+
+
 def init_db():
-    conn = sqlite3.connect("products.db")
+    conn = sqlite3.connect(str(DB_PATH), timeout=10)
     cursor = conn.cursor()
     cursor.execute(
         """
@@ -34,7 +39,7 @@ def init_db():
     conn.close()
 
 def update_balance(user_id, amount):
-    conn = sqlite3.connect("products.db")
+    conn = sqlite3.connect(str(DB_PATH), timeout=10)
     cursor = conn.cursor()
     cursor.execute(
         "UPDATE users SET balance = balance + ? WHERE user_id = ?",
@@ -77,7 +82,7 @@ plans_db = {
     "166": [{"plan_name": "1 DAYS", "price": 80.00}, {"plan_name": "30 DAYS", "price": 600.00}],
 }
 def init_db():
-    conn = sqlite3.connect("products.db")
+    conn = sqlite3.connect(str(DB_PATH), timeout=10)
     cursor = conn.cursor()
     # Users table create karna balance column ke saath
     cursor.execute("""
@@ -98,7 +103,7 @@ def init_db():
     conn.close()
 # Balance update karne ka function
 def update_balance(user_id: int, amount: float):
-    conn = sqlite3.connect("products.db")
+    conn = sqlite3.connect(str(DB_PATH), timeout=10)
     cursor = conn.cursor()
     cursor.execute("""
         INSERT INTO users (user_id, balance) VALUES (?, ?)
@@ -111,7 +116,7 @@ def update_balance(user_id: int, amount: float):
 
 # Balance fetch karne ka function
 def get_balance(user_id: int) -> float:
-    conn = sqlite3.connect("products.db")
+    conn = sqlite3.connect(str(DB_PATH), timeout=10)
     cursor = conn.cursor()
     cursor.execute("SELECT balance FROM users WHERE user_id = ?", (user_id,))
     result = cursor.fetchone()
@@ -373,8 +378,16 @@ async def menu_support(call: types.CallbackQuery):
  await call.answer()
 @router.callback_query(F.data == "menu_back")
 async def process_menu_back(call: types.CallbackQuery):
+    await call.answer()
     current_balance = get_balance(call.from_user.id)
-    await call.message.delete()
+
+    # Deleting an old message can fail (already deleted / no permission).
+    # Still show the main menu instead of leaving the user stuck.
+    try:
+        await call.message.delete()
+    except Exception:
+        logging.exception("Could not delete previous menu message; sending main menu anyway")
+
     await call.message.answer(
     "<blockquote><b>🏪 SAHIL BHAI STORE 🔓</b></blockquote>\n\n"
     "〰️〰️〰️〰️〰️〰️〰️〰️〰️〰️\n\n"
@@ -401,7 +414,7 @@ async def process_daily_gift(call: types.CallbackQuery):
     user_id = call.from_user.id
     current_time = time.time()
     
-    conn = sqlite3.connect("products.db")
+    conn = sqlite3.connect(str(DB_PATH), timeout=10)
     cursor = conn.cursor()
     cursor.execute("SELECT last_spin_time FROM daily_spin WHERE user_id = ?", (user_id,))
     result = cursor.fetchone()
@@ -594,10 +607,12 @@ from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
 
 @router.callback_query(F.data == "main_menu")
 async def process_main_menu(call: types.CallbackQuery):
-
-    # यहाँ आपका मेन मेन्यू कीबोर्ड कोड होना चाहिए
+    await call.answer()
     current_balance = get_balance(call.from_user.id)
-    await call.message.delete()
+    try:
+        await call.message.delete()
+    except Exception:
+        logging.exception("Could not delete previous message; sending main menu anyway")
     await call.message.answer(
     "<blockquote><b>🏪 SAHIL BHAI STORE 🔓</b></blockquote>\n\n"
      "〰️〰️〰️〰️〰️〰️〰️〰️〰️〰️\n\n"
@@ -713,7 +728,7 @@ def process_spin(user_id):
     current_time = time.time()
     cooldown = 24 * 3600
 
-    conn = sqlite3.connect("products.db", timeout=10)
+    conn = sqlite3.connect(str(DB_PATH), timeout=10)
     try:
         cursor = conn.cursor()
         cursor.execute("BEGIN IMMEDIATE")
@@ -767,8 +782,8 @@ async def spin_now(call: types.CallbackQuery):
         new_balance = status_result["balance"]
 
         text = (
-            f"<blockquote><b>🎁 Daily Gift Spin Winner!</b></blockquote>\\n\\n"
-            f"You won: <b>🪙₹{amount:.2f}</b>\\n\\n"
+            f"<blockquote><b>🎁 Daily Gift Spin Winner!</b></blockquote>\n\n"
+            f"You won: <b>🪙₹{amount:.2f}</b>\n\n"
             f"Updated Wallet: <b>🪙₹{new_balance:.2f}</b>"
         )
 
