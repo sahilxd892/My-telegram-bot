@@ -221,17 +221,18 @@ def update_kb():
 
 
 
+
 @dp.callback_query(F.data == "menu_check_update")
 async def process_check_update(call: types.CallbackQuery):
     await call.answer()
     print("Check Update button pressed")
 
-    # Existing Check Update callback and Back button are preserved.
-    # Telegram builds the channel preview from the public channel link.
     channel_url = "https://t.me/Sahilbhaiallupdate"
+
     update_text = (
-        "<blockquote>📢 Follow our updates channel:</blockquote>\\n\\n"
-        "🔗 <b>Click Here For Setup & Updates</b>\\n"
+        "<blockquote>📢 Follow our updates channel:</blockquote>\n\n"
+        "🔗 <a href=\"https://t.me/Sahilbhaiallupdate\">"
+        "<b>Click Here For Setup &amp; Updates</b></a>\n\n"
         f"{channel_url}"
     )
 
@@ -239,14 +240,12 @@ async def process_check_update(call: types.CallbackQuery):
         text=update_text,
         parse_mode="HTML",
         reply_markup=update_kb(),
-        liqnk_preview_options=types.LinkPreviewOptions(
+        link_preview_options=types.LinkPreviewOptions(
             is_disabled=False,
             prefer_large_media=True,
             show_above_text=False,
         ),
     )
-
-
 
 
 
