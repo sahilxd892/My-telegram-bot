@@ -1,6 +1,7 @@
 import sqlite3
 from pathlib import Path
 import logging
+import os
 from datetime import datetime, timedelta
 import time
 import asyncio
@@ -19,17 +20,43 @@ import aiohttp
 from aiogram.types import CallbackQuery
 
 
-# Keep using the existing products.db from the original launch directory when present.
-# This avoids silently opening a brand-new empty database and showing ₹0.00.
+# Use one persistent database file. If both common locations already contain
+# a users table, prefer the one with the most saved user records so balances
+# are not accidentally replaced by an empty database after restarting the bot.
 _SCRIPT_DB = Path(__file__).resolve().with_name("products.db")
 _CWD_DB = Path.cwd() / "products.db"
-if _CWD_DB.exists():
-    DB_PATH = _CWD_DB
-elif _SCRIPT_DB.exists():
-    DB_PATH = _SCRIPT_DB
+
+def _database_score(path: Path):
+    if not path.exists():
+        return (-1, -1)
+    try:
+        conn = sqlite3.connect(str(path), timeout=5)
+        tables = {row[0] for row in conn.execute(
+            "SELECT name FROM sqlite_master WHERE type='table'"
+        ).fetchall()}
+        if "users" not in tables:
+            conn.close()
+            return (0, 0)
+        count = conn.execute("SELECT COUNT(*) FROM users").fetchone()[0]
+        conn.close()
+        return (1, count)
+    except sqlite3.Error:
+        return (-1, -1)
+
+_candidates = []
+for _path in (_CWD_DB, _SCRIPT_DB):
+    if _path not in _candidates:
+        _candidates.append(_path)
+
+_existing = [p for p in _candidates if p.exists()]
+if _existing:
+    # Highest score wins; ties keep the original working-directory DB first.
+    DB_PATH = max(_existing, key=lambda p: _database_score(p))
 else:
-    # Match the original code's sqlite3.connect("products.db") behavior.
-    DB_PATH = _CWD_DB
+    # First run: create products.db next to this script, independent of launch cwd.
+    DB_PATH = _SCRIPT_DB
+
+logging.info("Using persistent balance database: %s", DB_PATH)
 
 
 def init_db():
@@ -134,12 +161,15 @@ def update_balance(user_id: int, amount: float):
 
 # Balance fetch karne ka function
 def get_balance(user_id: int) -> float:
+    """Read a user's saved balance without changing it."""
     conn = sqlite3.connect(str(DB_PATH), timeout=10)
     try:
-        cursor = conn.cursor()
-        cursor.execute("SELECT balance FROM users WHERE user_id = ?", (user_id,))
-        result = cursor.fetchone()
-        return float(result[0]) if result and result[0] is not None else 0.0
+        row = conn.execute(
+            "SELECT balance FROM users WHERE user_id = ?", (user_id,)
+        ).fetchone()
+        # A missing row is treated as zero for display only; this function never
+        # inserts, resets, or subtracts from the user's stored balance.
+        return float(row[0]) if row and row[0] is not None else 0.0
     finally:
         conn.close()
 
@@ -174,8 +204,10 @@ def get_menu_message(user_id: int):
         conn.close()
 
 # बोट सेटअप
-API_TOKEN = '8658970425:AAFBUFFcSUHqmY_-oMtvqJnzFz_6vSFdGw0'
+API_TOKEN = "PASTE_YOUR_NEW_BOT_TOKEN_HERE"
 logging.basicConfig(level=logging.INFO)
+if API_TOKEN == "8658970425:AAFBUFFcSUHqmY_-oMtvqJnzFz_6vSFdGw0":
+    raise RuntimeError("Open this file and replace PASTE_YOUR_NEW_BOT_TOKEN_HERE with your NEW token from BotFather.")
 bot = Bot(token=API_TOKEN)
 dp = Dispatcher()
 router = Router()
