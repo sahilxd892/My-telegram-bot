@@ -19,8 +19,17 @@ import aiohttp
 from aiogram.types import CallbackQuery
 
 
-# Always use the database beside this script, regardless of the launch directory.
-DB_PATH = Path(__file__).resolve().with_name("products.db")
+# Keep using the existing products.db from the original launch directory when present.
+# This avoids silently opening a brand-new empty database and showing ₹0.00.
+_SCRIPT_DB = Path(__file__).resolve().with_name("products.db")
+_CWD_DB = Path.cwd() / "products.db"
+if _CWD_DB.exists():
+    DB_PATH = _CWD_DB
+elif _SCRIPT_DB.exists():
+    DB_PATH = _SCRIPT_DB
+else:
+    # Match the original code's sqlite3.connect("products.db") behavior.
+    DB_PATH = _CWD_DB
 
 
 def init_db():
@@ -97,7 +106,16 @@ def init_db():
         user_id INTEGER PRIMARY KEY,
         last_spin_time INTEGER
     )
-""")
+    """)
+
+    # Track the latest main-menu message so /start can replace it instead of stacking menus.
+    cursor.execute("""
+        CREATE TABLE IF NOT EXISTS bot_ui_state (
+            user_id INTEGER PRIMARY KEY,
+            chat_id INTEGER NOT NULL,
+            menu_message_id INTEGER NOT NULL
+        )
+    """)
 
     conn.commit()
     conn.close()
@@ -117,11 +135,43 @@ def update_balance(user_id: int, amount: float):
 # Balance fetch karne ka function
 def get_balance(user_id: int) -> float:
     conn = sqlite3.connect(str(DB_PATH), timeout=10)
-    cursor = conn.cursor()
-    cursor.execute("SELECT balance FROM users WHERE user_id = ?", (user_id,))
-    result = cursor.fetchone()
-    conn.close()
-    return result[0] if result else 0.0
+    try:
+        cursor = conn.cursor()
+        cursor.execute("SELECT balance FROM users WHERE user_id = ?", (user_id,))
+        result = cursor.fetchone()
+        return float(result[0]) if result and result[0] is not None else 0.0
+    finally:
+        conn.close()
+
+
+def save_menu_message(user_id: int, chat_id: int, message_id: int) -> None:
+    conn = sqlite3.connect(str(DB_PATH), timeout=10)
+    try:
+        conn.execute(
+            """
+            INSERT INTO bot_ui_state (user_id, chat_id, menu_message_id)
+            VALUES (?, ?, ?)
+            ON CONFLICT(user_id) DO UPDATE SET
+                chat_id = excluded.chat_id,
+                menu_message_id = excluded.menu_message_id
+            """,
+            (user_id, chat_id, message_id),
+        )
+        conn.commit()
+    finally:
+        conn.close()
+
+
+def get_menu_message(user_id: int):
+    conn = sqlite3.connect(str(DB_PATH), timeout=10)
+    try:
+        row = conn.execute(
+            "SELECT chat_id, menu_message_id FROM bot_ui_state WHERE user_id = ?",
+            (user_id,),
+        ).fetchone()
+        return row
+    finally:
+        conn.close()
 
 # बोट सेटअप
 API_TOKEN = '8869365595:AAE91YUbPRqMg-OF1h5LW2M6MsDKoTLPIaQ'
@@ -217,11 +267,38 @@ def main_menu_text(user_id: int) -> str:
 
 @dp.message(Command("start"))
 async def send_welcome(message: types.Message):
-    await message.answer(
-        main_menu_text(message.from_user.id),
+    user_id = message.from_user.id
+
+    # Remove the previous bot menu; if Telegram refuses deletion, replace it in place.
+    previous = get_menu_message(user_id)
+    if previous:
+        previous_chat_id, previous_message_id = previous
+        try:
+            await bot.delete_message(
+                chat_id=previous_chat_id,
+                message_id=previous_message_id,
+            )
+        except Exception as delete_exc:
+            logging.info("Previous menu delete failed during /start: %s", delete_exc)
+            try:
+                edited = await bot.edit_message_text(
+                    chat_id=previous_chat_id,
+                    message_id=previous_message_id,
+                    text=main_menu_text(user_id),
+                    parse_mode="HTML",
+                    reply_markup=main_menu_kb(),
+                )
+                save_menu_message(user_id, previous_chat_id, edited.message_id)
+                return
+            except Exception as edit_exc:
+                logging.info("Previous menu edit failed during /start: %s", edit_exc)
+
+    sent = await message.answer(
+        main_menu_text(user_id),
         parse_mode="HTML",
         reply_markup=main_menu_kb(),
     )
+    save_menu_message(user_id, message.chat.id, sent.message_id)
 
 
 def update_kb():
@@ -383,33 +460,33 @@ async def menu_support(call: types.CallbackQuery):
  )
  await call.answer()
 async def return_to_main_menu(call: types.CallbackQuery):
-    """Remove the submenu when possible and always show a freshly fetched balance."""
+    """Delete the submenu when possible; otherwise edit it in place, with a fresh balance."""
     user_id = call.from_user.id
+    chat_id = call.message.chat.id
     menu_text = main_menu_text(user_id)  # reads the latest committed balance
 
-    # Prefer deleting the old submenu so it cannot remain above the new menu.
     try:
         await call.message.delete()
     except Exception as delete_exc:
-        logging.info("Submenu delete failed; trying to replace it: %s", delete_exc)
-        # If Telegram refuses deletion, replace that same message to avoid stale content.
+        logging.info("Submenu delete failed; replacing same message: %s", delete_exc)
         try:
-            await call.message.edit_text(
+            edited = await call.message.edit_text(
                 text=menu_text,
                 parse_mode="HTML",
                 reply_markup=main_menu_kb(),
             )
+            save_menu_message(user_id, chat_id, edited.message_id)
             return
         except Exception as edit_exc:
             logging.warning("Submenu edit also failed; sending a fresh menu: %s", edit_exc)
 
-    # Message was deleted, or both delete/edit were unavailable.
-    await call.bot.send_message(
-        chat_id=call.message.chat.id,
+    sent = await call.bot.send_message(
+        chat_id=chat_id,
         text=menu_text,
         parse_mode="HTML",
         reply_markup=main_menu_kb(),
     )
+    save_menu_message(user_id, chat_id, sent.message_id)
 
 
 @router.callback_query(F.data == "menu_back")
@@ -773,7 +850,7 @@ async def spin_now(call: types.CallbackQuery):
 
         text = (
             f"<blockquote><b>🎁 Daily Gift Spin Winner!</b></blockquote>\n\n"
-            f"You won a randomized claim of: <b>🪙₹{amount:.2f}</b>\n\n"
+            f"You won: <b>🪙₹{amount:.2f}</b>\n\n"
             f"Updated Wallet: <b>🪙₹{new_balance:.2f}</b>"
         )
 
