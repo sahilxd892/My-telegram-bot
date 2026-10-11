@@ -1,7 +1,5 @@
 import sqlite3
-from pathlib import Path
 import logging
-import os
 from datetime import datetime, timedelta
 import time
 import asyncio
@@ -20,47 +18,8 @@ import aiohttp
 from aiogram.types import CallbackQuery
 
 
-# Use one persistent database file. If both common locations already contain
-# a users table, prefer the one with the most saved user records so balances
-# are not accidentally replaced by an empty database after restarting the bot.
-_SCRIPT_DB = Path(__file__).resolve().with_name("products.db")
-_CWD_DB = Path.cwd() / "products.db"
-
-def _database_score(path: Path):
-    if not path.exists():
-        return (-1, -1)
-    try:
-        conn = sqlite3.connect(str(path), timeout=5)
-        tables = {row[0] for row in conn.execute(
-            "SELECT name FROM sqlite_master WHERE type='table'"
-        ).fetchall()}
-        if "users" not in tables:
-            conn.close()
-            return (0, 0)
-        count = conn.execute("SELECT COUNT(*) FROM users").fetchone()[0]
-        conn.close()
-        return (1, count)
-    except sqlite3.Error:
-        return (-1, -1)
-
-_candidates = []
-for _path in (_CWD_DB, _SCRIPT_DB):
-    if _path not in _candidates:
-        _candidates.append(_path)
-
-_existing = [p for p in _candidates if p.exists()]
-if _existing:
-    # Highest score wins; ties keep the original working-directory DB first.
-    DB_PATH = max(_existing, key=lambda p: _database_score(p))
-else:
-    # First run: create products.db next to this script, independent of launch cwd.
-    DB_PATH = _SCRIPT_DB
-
-logging.info("Using persistent balance database: %s", DB_PATH)
-
-
 def init_db():
-    conn = sqlite3.connect(str(DB_PATH), timeout=10)
+    conn = sqlite3.connect("products.db")
     cursor = conn.cursor()
     cursor.execute(
         """
@@ -75,7 +34,7 @@ def init_db():
     conn.close()
 
 def update_balance(user_id, amount):
-    conn = sqlite3.connect(str(DB_PATH), timeout=10)
+    conn = sqlite3.connect("products.db")
     cursor = conn.cursor()
     cursor.execute(
         "UPDATE users SET balance = balance + ? WHERE user_id = ?",
@@ -118,7 +77,7 @@ plans_db = {
     "166": [{"plan_name": "1 DAYS", "price": 80.00}, {"plan_name": "30 DAYS", "price": 600.00}],
 }
 def init_db():
-    conn = sqlite3.connect(str(DB_PATH), timeout=10)
+    conn = sqlite3.connect("products.db")
     cursor = conn.cursor()
     # Users table create karna balance column ke saath
     cursor.execute("""
@@ -133,22 +92,13 @@ def init_db():
         user_id INTEGER PRIMARY KEY,
         last_spin_time INTEGER
     )
-    """)
-
-    # Track the latest main-menu message so /start can replace it instead of stacking menus.
-    cursor.execute("""
-        CREATE TABLE IF NOT EXISTS bot_ui_state (
-            user_id INTEGER PRIMARY KEY,
-            chat_id INTEGER NOT NULL,
-            menu_message_id INTEGER NOT NULL
-        )
-    """)
+""")
 
     conn.commit()
     conn.close()
 # Balance update karne ka function
 def update_balance(user_id: int, amount: float):
-    conn = sqlite3.connect(str(DB_PATH), timeout=10)
+    conn = sqlite3.connect("products.db")
     cursor = conn.cursor()
     cursor.execute("""
         INSERT INTO users (user_id, balance) VALUES (?, ?)
@@ -161,53 +111,16 @@ def update_balance(user_id: int, amount: float):
 
 # Balance fetch karne ka function
 def get_balance(user_id: int) -> float:
-    """Read a user's saved balance without changing it."""
-    conn = sqlite3.connect(str(DB_PATH), timeout=10)
-    try:
-        row = conn.execute(
-            "SELECT balance FROM users WHERE user_id = ?", (user_id,)
-        ).fetchone()
-        # A missing row is treated as zero for display only; this function never
-        # inserts, resets, or subtracts from the user's stored balance.
-        return float(row[0]) if row and row[0] is not None else 0.0
-    finally:
-        conn.close()
-
-
-def save_menu_message(user_id: int, chat_id: int, message_id: int) -> None:
-    conn = sqlite3.connect(str(DB_PATH), timeout=10)
-    try:
-        conn.execute(
-            """
-            INSERT INTO bot_ui_state (user_id, chat_id, menu_message_id)
-            VALUES (?, ?, ?)
-            ON CONFLICT(user_id) DO UPDATE SET
-                chat_id = excluded.chat_id,
-                menu_message_id = excluded.menu_message_id
-            """,
-            (user_id, chat_id, message_id),
-        )
-        conn.commit()
-    finally:
-        conn.close()
-
-
-def get_menu_message(user_id: int):
-    conn = sqlite3.connect(str(DB_PATH), timeout=10)
-    try:
-        row = conn.execute(
-            "SELECT chat_id, menu_message_id FROM bot_ui_state WHERE user_id = ?",
-            (user_id,),
-        ).fetchone()
-        return row
-    finally:
-        conn.close()
+    conn = sqlite3.connect("products.db")
+    cursor = conn.cursor()
+    cursor.execute("SELECT balance FROM users WHERE user_id = ?", (user_id,))
+    result = cursor.fetchone()
+    conn.close()
+    return result[0] if result else 0.0
 
 # बोट सेटअप
-API_TOKEN = "8658970425:AAFBUFFcSUHqmY_-oMtvqJnzFz_6vSFdGw0"
+API_TOKEN = '8869365595:AAE91YUbPRqMg-OF1h5LW2M6MsDKoTLPIaQ'
 logging.basicConfig(level=logging.INFO)
-if API_TOKEN == "8658970425:AAE2f0i5rJtuPyQhdQVoctahmlY8ROwhIqA":
-    raise RuntimeError("Open this file and replace PASTE_YOUR_NEW_BOT_TOKEN_HERE with your NEW token from BotFather.")
 bot = Bot(token=API_TOKEN)
 dp = Dispatcher()
 router = Router()
@@ -277,38 +190,27 @@ def main_menu_kb() -> InlineKeyboardMarkup:
 
     return kb
 
-def main_menu_text(user_id: int) -> str:
-    # Always fetch the latest committed balance whenever the menu is shown.
-    current_balance = get_balance(user_id)
-    return (
-        "<blockquote><b>🏪 SAHIL BHAI STORE 🔓</b></blockquote>\n\n"
-        "〰️〰️〰️〰️〰️〰️〰️〰️〰️〰️\n\n"
-        "┝🛍️ Buy Now : All Key Purchase & Instant Delivery\n"
-        "┝📢 Check Update : Check Setup Video And Update Apk\n"
-        "┝🪙 Add Balance : Deposit Balance & Secure Auto-Add Payment System\n"
-        "┝🆔 My Profile + All History : Check Your Account Information + All History\n"
-        "┝👥 Refer And Earn : Share Refer Link & Earn Money\n"
-        "┝🎬  How To Use Bot : View Tutorial And Work This Bot\n"
-        "┝📨 Support : Bot Problem Fixed For Support Admin\n"
-        "┝🎁 Daily Gift : Free Spin and win random balance daily, Only one spin every 24 hours.\n\n"
-        "〰️〰️〰️〰️〰️〰️〰️〰️〰️〰️\n\n"
-        f"<blockquote><b>💰 Your Balance: 🪙₹{current_balance:.2f}</b></blockquote>\n\n"
-        "<b>👇 Select an option from the menu below:</b>"
-    )
-
-
+# यहाँ आप अपने कमान्ड हैंडर्स जोड़ सकते हैं
 @dp.message(Command("start"))
 async def send_welcome(message: types.Message):
-    user_id = message.from_user.id
-
-    # Do not delete or edit any previous message when /start is sent.
-    # Always send a new main-menu message with the latest database balance.
-    sent = await message.answer(
-        main_menu_text(user_id),
-        parse_mode="HTML",
-        reply_markup=main_menu_kb(),
-    )
-    save_menu_message(user_id, message.chat.id, sent.message_id)
+    current_balance = get_balance(message.from_user.id)
+    await message.answer(
+     "<blockquote><b>🏪 SAHIL BHAI STORE 🔓</b></blockquote>\n\n"
+     "〰️〰️〰️〰️〰️〰️〰️〰️〰️〰️\n\n"
+     "┝🛍️ Buy Now : All Key Purchase & Instant Delivery\n"
+     "┝📢 Check Update : Check Setup Video And Update Apk\n"
+     "┝🪙 Add Balance : Deposit Balance & Secure Auto-Add Payment System\n"
+     "┝🆔 My Profile + All History : Check Your Account Information + All History\n"
+     "┝👥 Refer And Earn : Share Refer Link & Earn Money\n"
+     "┝🎬  How To Use Bot : View Tutorial And Work This Bot\n"
+     "┝📨 Support : Bot Problem Fixed For Support Admin\n"
+     "┝🎁 Daily Gift : Free Spin and win random balance daily, Only one spin every 24 hours.\n\n"
+     "〰️〰️〰️〰️〰️〰️〰️〰️〰️〰️\n\n"
+     f"<blockquote><b>💰 Your Balance: 🪙₹{current_balance:.2f}</b></blockquote>\n\n"  
+     "<b>👇 Select an option from the menu below:</b>",
+     parse_mode="HTML",
+     reply_markup=main_menu_kb(),
+ )
 
 
 def update_kb():
@@ -411,7 +313,7 @@ from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
 @router.callback_query(F.data == "menu_refer")
 async def refer_and_earn(call: types.CallbackQuery):
     user_id = call.from_user.id
-    bot_username = "Sahil6171_bot"
+    bot_username = "Sahilbhaistorebhaibot"
     referral_link = f"https://t.me/{bot_username}?start=ref{user_id}"
 
     message_text = (
@@ -469,89 +371,29 @@ async def menu_support(call: types.CallbackQuery):
  reply_markup=support_kb(),
  )
  await call.answer()
-async def return_to_main_menu(call: types.CallbackQuery):
-    """Delete the submenu when possible; otherwise edit it in place, with a fresh balance."""
-    user_id = call.from_user.id
-    chat_id = call.message.chat.id
-    menu_text = main_menu_text(user_id)  # reads the latest committed balance
-
-    try:
-        await call.message.delete()
-    except Exception as delete_exc:
-        logging.info("Submenu delete failed; replacing same message: %s", delete_exc)
-        try:
-            edited = await call.message.edit_text(
-                text=menu_text,
-                parse_mode="HTML",
-                reply_markup=main_menu_kb(),
-            )
-            save_menu_message(user_id, chat_id, edited.message_id)
-            return
-        except Exception as edit_exc:
-            logging.warning("Submenu edit also failed; sending a fresh menu: %s", edit_exc)
-
-    sent = await call.bot.send_message(
-        chat_id=chat_id,
-        text=menu_text,
-        parse_mode="HTML",
-        reply_markup=main_menu_kb(),
-    )
-    save_menu_message(user_id, chat_id, sent.message_id)
-
-
 @router.callback_query(F.data == "menu_back")
 async def process_menu_back(call: types.CallbackQuery):
-    await call.answer()
-    await return_to_main_menu(call)
+    current_balance = get_balance(call.from_user.id)
+    await call.message.delete()
+    await call.message.answer(
+    "<blockquote><b>🏪 SAHIL BHAI STORE 🔓</b></blockquote>\n\n"
+    "〰️〰️〰️〰️〰️〰️〰️〰️〰️〰️\n\n"
+    "┝🛍️ Buy Now : All Key Purchase & Instant Delivery\n"
+    "┝📢 Check Update : Check Setup Video And Update Apk\n"
+    "┝🪙 Add Balance : Deposit Balance & Secure Auto-Add Payment System\n"
+    "┝🆔 My Profile + All History : Check Your Account Information + All History\n"
+    "┝👥 Refer And Earn : Share Refer Link & Earn Money\n"
+    "┝🎬  How To Use Bot : View Tutorial And Work This Bot\n"
+    "┝📨 Support : Bot Problem Fixed For Support Admin\n"
+    "┝🎁 Daily Gift : Free Spin and win random balance daily, Only one spin every 24 hours.\n\n"
+    "〰️〰️〰️〰️〰️〰️〰️〰️〰️〰️\n\n"
+    f"<blockquote><b>💰 Your  Balance: 🪙₹{current_balance:.2f}</b></blockquote>\n\n"  
+    "<b>👇 Select an option from the menu below:</b>",
+    parse_mode="HTML",
+    reply_markup=main_menu_kb(),
+ )
 
-import random
 
-@router.callback_query(F.data == "menu_daily_gift")
-async def process_daily_gift(call: types.CallbackQuery):
-    await call.answer()
-    user_id = call.from_user.id
-    current_time = time.time()
-    
-    conn = sqlite3.connect(str(DB_PATH), timeout=10)
-    cursor = conn.cursor()
-    cursor.execute("SELECT last_spin_time FROM daily_spin WHERE user_id = ?", (user_id,))
-    result = cursor.fetchone()
-    last_spin_time = result[0] if result else 0
-    cooldown = 24 * 3600
-    conn.close()
-
-    if current_time - last_spin_time >= cooldown:
-        text = (f"<blockquote><b>🎁 Daily Lucky Spin Wheel </b></blockquote>\n\n"
-                f"Spin the wheel once every 24 hours and win free balance credited instantly to your wallet!\n\n"
-                f"┝ 🪙 Winning Range: ₹0.00 to ₹1.00\n"
-                f"┝ ⏳ Spin Limit: 1 spin per 24 hours\n\n"
-                f"👇 Click the button below to try your luck:")
-                
-        keyboard = types.InlineKeyboardMarkup(inline_keyboard=[
-            [types.InlineKeyboardButton(text="Spin Now!", callback_data="spin_now", style="success")],
-            [types.InlineKeyboardButton(text="Back to Menu", callback_data="menu_back", style="danger")]
-        ])
-    else:
-        remaining_time = cooldown - (current_time - last_spin_time)
-        hours = int(remaining_time // 3600)
-        minutes = int((remaining_time % 3600) // 60)
-        
-        text = (
-        f"<b><blockquote>🎁 Daily Lucky Spin Wheel </blockquote></b>\n\n"
-        "〰️〰️〰️〰️〰️〰️〰️〰️〰️〰️\n\n"
-        "Spin the wheel once every 24 hours and win free balance credited instantly to your wallet!\n\n"
-        "<b>┝🪙Winning Range:</b> ₹0.00 to ₹1.00\n"
-        "<b>┝⏳Spin Limit:</b> 1 spin per 24 hours\n\n"
-        f"<b><blockquote>⏳You have already claimed today's spin! </blockquote></b>\n"
-        f"Please wait another {hours}h {minutes}m before trying to spin the wheel again."
-)
-                
-        keyboard = types.InlineKeyboardMarkup(inline_keyboard=[
-            [types.InlineKeyboardButton(text=f"Lock ({hours}h {minutes}m)", callback_data="ignore", style="success")],
-            [types.InlineKeyboardButton(text="Back to Menu", callback_data="menu_back", style="danger")]
-        ])
-
-    await call.message.edit_text(text, reply_markup=keyboard, parse_mode="HTML")
 
 
 
@@ -705,8 +547,27 @@ from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
 
 @router.callback_query(F.data == "main_menu")
 async def process_main_menu(call: types.CallbackQuery):
-    await call.answer()
-    await return_to_main_menu(call)
+
+    # यहाँ आपका मेन मेन्यू कीबोर्ड कोड होना चाहिए
+    current_balance = get_balance(call.from_user.id)
+    await call.message.delete()
+    await call.message.answer(
+    "<blockquote><b>🏪 SAHIL BHAI STORE 🔓</b></blockquote>\n\n"
+     "〰️〰️〰️〰️〰️〰️〰️〰️〰️〰️\n\n"
+     "┝🛍️ Buy Now : All Key Purchase & Instant Delivery\n"
+     "┝📢 Check Update : Check Setup Video And Update Apk\n"
+     "┝🪙 Add Balance : Deposit Balance & Secure Auto-Add Payment System\n"
+     "┝🆔 My Profile + All History : Check Your Account Information + All History\n"
+     "┝👥 Refer And Earn : Share Refer Link & Earn Money\n"
+     "┝🎬  How To Use Bot : View Tutorial And Work This Bot\n"
+     "┝📨 Support : Bot Problem Fixed For Support Admin\n"
+     "┝🎁 Daily Gift : Free Spin and win random balance daily, Only one spin every 24 hours.\n\n"
+     "〰️〰️〰️〰️〰️〰️〰️〰️〰️〰️\n\n"
+     f"<blockquote><b>💰 Your Balance: 🪙₹{current_balance:.2f}</b></blockquote>\n\n"  
+     "<b>👇 Select an option from the menu below:</b>",
+     parse_mode="HTML",
+     reply_markup=main_menu_kb(),
+ )
 
 @router.callback_query(F.data == "menu_shop")
 async def process_menu_shop(call: types.CallbackQuery):
@@ -798,90 +659,6 @@ async def process_buy_product(call: types.CallbackQuery):
 
     
     
-import random
-
-def process_spin(user_id):
-    """Atomically claim the daily spin and credit its reward to the wallet."""
-    current_time = time.time()
-    cooldown = 24 * 3600
-
-    conn = sqlite3.connect(str(DB_PATH), timeout=10)
-    try:
-        cursor = conn.cursor()
-        cursor.execute("BEGIN IMMEDIATE")
-        cursor.execute(
-            "SELECT last_spin_time FROM daily_spin WHERE user_id = ?",
-            (user_id,),
-        )
-        result = cursor.fetchone()
-        last_spin_time = result[0] if result else 0
-
-        if current_time - last_spin_time < cooldown:
-            remaining_time = cooldown - (current_time - last_spin_time)
-            conn.rollback()
-            return {"status": "cooldown", "remaining_time": remaining_time}
-
-        # Keep the reward above zero so the user does not win ₹0.00.
-        amount = round(random.uniform(0.01, 1.00), 2)
-
-        cursor.execute(
-            """
-            INSERT INTO users (user_id, balance) VALUES (?, ?)
-            ON CONFLICT(user_id) DO UPDATE SET balance = balance + excluded.balance
-            """,
-            (user_id, amount),
-        )
-        cursor.execute(
-            """
-            INSERT INTO daily_spin (user_id, last_spin_time) VALUES (?, ?)
-            ON CONFLICT(user_id) DO UPDATE SET last_spin_time = excluded.last_spin_time
-            """,
-            (user_id, current_time),
-        )
-        cursor.execute("SELECT balance FROM users WHERE user_id = ?", (user_id,))
-        new_balance = cursor.fetchone()[0]
-        conn.commit()
-        return {"status": "won", "amount": amount, "balance": new_balance}
-    except Exception:
-        conn.rollback()
-        raise
-    finally:
-        conn.close()
-
-@router.callback_query(F.data == "spin_now")
-async def spin_now(call: types.CallbackQuery):
-    user_id = call.from_user.id
-    status_result = process_spin(user_id)
-
-    if status_result["status"] == "won":
-        amount = status_result["amount"]
-        # process_spin already credited the wallet in the same database transaction.
-        new_balance = status_result["balance"]
-
-        text = (
-            f"<blockquote><b>🎁 Daily Gift Spin Winner!</b></blockquote>\n\n"
-            f"You won: <b>🪙₹{amount:.2f}</b>\n\n"
-            f"Updated Wallet: <b>🪙₹{new_balance:.2f}</b>"
-        )
-
-        keyboard = types.InlineKeyboardMarkup(inline_keyboard=[
-            [types.InlineKeyboardButton(text="Back to Menu", callback_data="menu_back", style="danger")]
-        ])
-    else:
-        remaining_time = status_result["remaining_time"]
-        hours = int(remaining_time // 3600)
-        minutes = int((remaining_time % 3600) // 60)
-        
-        text = (
-    f"<b><blockquote>🎁 Daily Lucky Spin Wheel </blockquote></b>\n\n"
-    "〰️〰️〰️〰️〰️〰️〰️〰️〰️〰️\n\n"
-    "Spin the wheel once every 24 hours and win free balance credited instantly to your wallet!\n\n"
-    "<b>┝🪙Winning Range:</b> ₹0.00 to ₹1.00\n"
-    "<b>┝⏳Spin Limit:</b> 1 spin per 24 hours\n\n"
-    f"<b><blockquote>⏳You have already claimed today's spin! </blockquote></b>\n"
-    f"Please wait another {hours}h {minutes}m before trying to spin the wheel again."
-)
-    await call.message.edit_text(text, reply_markup=keyboard, parse_mode="HTML")
 
 
 
