@@ -206,7 +206,7 @@ def get_menu_message(user_id: int):
 # बोट सेटअप
 API_TOKEN = "8658970425:AAFBUFFcSUHqmY_-oMtvqJnzFz_6vSFdGw0"
 logging.basicConfig(level=logging.INFO)
-if API_TOKEN == "8658970425:AAFBUFFcSUHqmY_-oMtvqJnzFz_6vSFdGw0":
+if API_TOKEN == "8658970425:AAE2f0i5rJtuPyQhdQVoctahmlY8ROwhIqA":
     raise RuntimeError("Open this file and replace PASTE_YOUR_NEW_BOT_TOKEN_HERE with your NEW token from BotFather.")
 bot = Bot(token=API_TOKEN)
 dp = Dispatcher()
