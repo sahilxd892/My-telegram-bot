@@ -96,10 +96,9 @@ def init_db():
 def update_balance(user_id: int, amount: float):
     conn = get_conn()
     cursor = conn.cursor()
-    cursor.execute("""
-        INSERT INTO users (user_id, balance) VALUES (?, ?)
-        ON CONFLICT(user_id) DO UPDATE SET balance = balance + excluded.balance
-    """, (user_id, amount))
+    cursor.execute("UPDATE users SET balance = balance + ? WHERE user_id = ?", (amount, user_id))
+    if cursor.rowcount == 0:
+        cursor.execute("INSERT INTO users (user_id, balance) VALUES (?, ?)", (user_id, amount))
     conn.commit()
     conn.close()
 
@@ -188,35 +187,48 @@ def main_menu_kb() -> InlineKeyboardMarkup:
 
     return kb
 
+def main_menu_text(user_id: int) -> str:
+    """Main menu ka text. Balance HAMESHA DB se fresh padha jata hai."""
+    current_balance = get_balance(user_id)
+    return (
+        "<blockquote><b>🏪 SAHIL BHAI STORE 🔓</b></blockquote>\n\n"
+        "〰️〰️〰️〰️〰️〰️〰️〰️〰️〰️\n\n"
+        "┝🛍️ Buy Now : All Key Purchase & Instant Delivery\n"
+        "┝📢 Check Update : Check Setup Video And Update Apk\n"
+        "┝🪙 Add Balance : Deposit Balance & Secure Auto-Add Payment System\n"
+        "┝🆔 My Profile + All History : Check Your Account Information + All History\n"
+        "┝👥 Refer And Earn : Share Refer Link & Earn Money\n"
+        "┝🎬  How To Use Bot : View Tutorial And Work This Bot\n"
+        "┝📨 Support : Bot Problem Fixed For Support Admin\n"
+        "┝🎁 Daily Gift : Free Spin and win random balance daily, Only one spin every 24 hours.\n\n"
+        "〰️〰️〰️〰️〰️〰️〰️〰️〰️〰️\n\n"
+        f"<blockquote><b>💰 Your Balance: 🪙₹{current_balance:.2f}</b></blockquote>\n\n"
+        "<b>👇 Select an option from the menu below:</b>"
+    )
+
+
+async def show_main_menu(call: types.CallbackQuery):
+    """Back / Main Menu dabane par: purana message hatao, fresh balance ke saath menu bhejo."""
+    text = main_menu_text(call.from_user.id)
+    try:
+        await call.answer()
+    except Exception:
+        pass
+    try:
+        await call.message.delete()
+    except Exception:
+        pass  # message purana ho ya delete na ho paye, tab bhi menu zaroor aayega
+    await call.message.answer(text, parse_mode="HTML", reply_markup=main_menu_kb())
+
+
 # यहाँ आप अपने कमान्ड हैंडर्स जोड़ सकते हैं
 @dp.message(Command("start"))
 async def send_welcome(message: types.Message):
-    current_balance = get_balance(message.from_user.id)
     await message.answer(
-     "<blockquote><b>🏪 SAHIL BHAI STORE 🔓</b></blockquote>\n\n"
-     "〰️〰️〰️〰️〰️〰️〰️〰️〰️〰️\n\n"
-     "┝🛍️ Buy Now : All Key Purchase & Instant Delivery\n"
-     "┝📢 Check Update : Check Setup Video And Update Apk\n"
-     "┝🪙 Add Balance : Deposit Balance & Secure Auto-Add Payment System\n"
-     "┝🆔 My Profile + All History : Check Your Account Information + All History\n"
-     "┝👥 Refer And Earn : Share Refer Link & Earn Money\n"
-     "┝🎬  How To Use Bot : View Tutorial And Work This Bot\n"
-     "┝📨 Support : Bot Problem Fixed For Support Admin\n"
-     "┝🎁 Daily Gift : Free Spin and win random balance daily, Only one spin every 24 hours.\n\n"
-     "〰️〰️〰️〰️〰️〰️〰️〰️〰️〰️\n\n"
-     f"<blockquote><b>💰 Your Balance: 🪙₹{current_balance:.2f}</b></blockquote>\n\n"  
-     "<b>👇 Select an option from the menu below:</b>",
-     parse_mode="HTML",
-     reply_markup=main_menu_kb(),
- )
-
-
-def update_kb():
-    button = InlineKeyboardButton(text="Back", callback_data="menu_back")
-    kb = InlineKeyboardMarkup(inline_keyboard=[[button]])
-    kb.inline_keyboard[0][0].style = "danger"
-    return kb
-
+        main_menu_text(message.from_user.id),
+        parse_mode="HTML",
+        reply_markup=main_menu_kb(),
+    )
 
 
 @dp.message(Command("balance"))
@@ -377,25 +389,7 @@ async def menu_support(call: types.CallbackQuery):
  await call.answer()
 @router.callback_query(F.data == "menu_back")
 async def process_menu_back(call: types.CallbackQuery):
-    current_balance = get_balance(call.from_user.id)
-    await call.message.delete()
-    await call.message.answer(
-    "<blockquote><b>🏪 SAHIL BHAI STORE 🔓</b></blockquote>\n\n"
-    "〰️〰️〰️〰️〰️〰️〰️〰️〰️〰️\n\n"
-    "┝🛍️ Buy Now : All Key Purchase & Instant Delivery\n"
-    "┝📢 Check Update : Check Setup Video And Update Apk\n"
-    "┝🪙 Add Balance : Deposit Balance & Secure Auto-Add Payment System\n"
-    "┝🆔 My Profile + All History : Check Your Account Information + All History\n"
-    "┝👥 Refer And Earn : Share Refer Link & Earn Money\n"
-    "┝🎬  How To Use Bot : View Tutorial And Work This Bot\n"
-    "┝📨 Support : Bot Problem Fixed For Support Admin\n"
-    "┝🎁 Daily Gift : Free Spin and win random balance daily, Only one spin every 24 hours.\n\n"
-    "〰️〰️〰️〰️〰️〰️〰️〰️〰️〰️\n\n"
-    f"<blockquote><b>💰 Your  Balance: 🪙₹{current_balance:.2f}</b></blockquote>\n\n"  
-    "<b>👇 Select an option from the menu below:</b>",
-    parse_mode="HTML",
-    reply_markup=main_menu_kb(),
- )
+    await show_main_menu(call)
 
 import random
 
@@ -598,27 +592,7 @@ from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
 
 @router.callback_query(F.data == "main_menu")
 async def process_main_menu(call: types.CallbackQuery):
-
-    # यहाँ आपका मेन मेन्यू कीबोर्ड कोड होना चाहिए
-    current_balance = get_balance(call.from_user.id)
-    await call.message.delete()
-    await call.message.answer(
-    "<blockquote><b>🏪 SAHIL BHAI STORE 🔓</b></blockquote>\n\n"
-     "〰️〰️〰️〰️〰️〰️〰️〰️〰️〰️\n\n"
-     "┝🛍️ Buy Now : All Key Purchase & Instant Delivery\n"
-     "┝📢 Check Update : Check Setup Video And Update Apk\n"
-     "┝🪙 Add Balance : Deposit Balance & Secure Auto-Add Payment System\n"
-     "┝🆔 My Profile + All History : Check Your Account Information + All History\n"
-     "┝👥 Refer And Earn : Share Refer Link & Earn Money\n"
-     "┝🎬  How To Use Bot : View Tutorial And Work This Bot\n"
-     "┝📨 Support : Bot Problem Fixed For Support Admin\n"
-     "┝🎁 Daily Gift : Free Spin and win random balance daily, Only one spin every 24 hours.\n\n"
-     "〰️〰️〰️〰️〰️〰️〰️〰️〰️〰️\n\n"
-     f"<blockquote><b>💰 Your Balance: 🪙₹{current_balance:.2f}</b></blockquote>\n\n"  
-     "<b>👇 Select an option from the menu below:</b>",
-     parse_mode="HTML",
-     reply_markup=main_menu_kb(),
- )
+    await show_main_menu(call)
 
 @router.callback_query(F.data == "menu_shop")
 async def process_menu_shop(call: types.CallbackQuery):
@@ -736,13 +710,9 @@ def process_spin(user_id):
             "INSERT OR REPLACE INTO daily_spin (user_id, last_spin_time) VALUES (?, ?)",
             (user_id, current_time),
         )
-        cursor.execute(
-            """
-            INSERT INTO users (user_id, balance) VALUES (?, ?)
-            ON CONFLICT(user_id) DO UPDATE SET balance = balance + excluded.balance
-            """,
-            (user_id, amount),
-        )
+        cursor.execute("UPDATE users SET balance = balance + ? WHERE user_id = ?", (amount, user_id))
+        if cursor.rowcount == 0:
+            cursor.execute("INSERT INTO users (user_id, balance) VALUES (?, ?)", (user_id, amount))
         cursor.execute("SELECT balance FROM users WHERE user_id = ?", (user_id,))
         new_balance = float(cursor.fetchone()[0])
 
@@ -1000,5 +970,10 @@ if __name__ == '__main__':
     _users = _c.execute("SELECT COUNT(*) FROM users").fetchone()[0]
     _c.close()
     logging.info("BOT START | DB file: %s | users in DB: %s", DB_PATH, _users)
+    _c = get_conn()
+    _dups = _c.execute("SELECT COUNT(*) FROM (SELECT user_id FROM users GROUP BY user_id HAVING COUNT(*) > 1)").fetchone()[0]
+    _c.close()
+    if _dups:
+        logging.warning("DUPLICATE user rows in users table: %s (balance galat dikh sakta hai)", _dups)
     dp.include_router(router)
     asyncio.run(dp.start_polling(bot)) 
