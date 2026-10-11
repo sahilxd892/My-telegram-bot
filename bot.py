@@ -52,12 +52,12 @@ products_db = {
     "150": "DRIP CLIENT WIRE APK MOD",
     "136": "BALA MOD APK MOD",
     "155": "XYZ CHEATS NON ROOT",
-    "159": "ZRAX PANEL NON ROOT",
+    "166": "TROLL MODZ NON ROOT",
     "151": "ABCD PANEL NON ROOT",
     "66": "XYZ CHEATS ROOT",
     "155": "XYZ CHEATS NON ROOT",
     "63": "DRIP CLIENT ROOT",
-    "166": "TROLL MODZ NON ROOT",
+    "159": "ZRAX PANEL NON ROOT",
 }
 plans_db = {
     "62": [{"plan_name": "1 HOURS", "price": 15.00}, {"plan_name": "3 HOURS", "price": 30.00}, {"plan_name": "6 HOURS", "price": 45.00}, {"plan_name": "12 HOURS", "price": 60.00}, {"plan_name": "1 DAYS", "price": 75.00}, {"plan_name": "3 DAYS", "price": 150.00}, {"plan_name": "7 DAYS", "price": 300.00}],
@@ -67,12 +67,12 @@ plans_db = {
     "150": [{"plan_name": "1 HOURS", "price": 10.00}, {"plan_name": "6 HOURS", "price": 40.00}],
     "136": [{"plan_name": "3 DAYS", "price": 180.00}, {"plan_name": "7 DAYS", "price": 300.00}],
     "155": [{"plan_name": "12 HOURS", "price": 90.00}, {"plan_name": "1 DAYS", "price": 150.00}],
-    "159": [{"plan_name": "1 day", "price": 99.00}],
+    "166": [{"plan_name": "1 DAYS", "price": 80.00}, {"plan_name": "30 DAYS", "price": 600.00}],
     "151": [{"plan_name": "1 DAYS", "price": 50.00}, {"plan_name": "7 DAYS", "price": 250.00}],
     "66": [{"plan_name": "12 HOURS", "price": 60.00}, {"plan_name": "3 DAYS", "price": 200.00}],
     "155": [{"plan_name": "1 HOURS", "price": 5.00}, {"plan_name": "1 DAYS", "price": 30.00}],
     "63": [{"plan_name": "6 HOURS", "price": 50.00}, {"plan_name": "7 DAYS", "price": 280.00}],
-    "166": [{"plan_name": "1 DAYS", "price": 80.00}, {"plan_name": "30 DAYS", "price": 600.00}],
+    "159": [{"plan_name": "1 days", "price": 99.000}],
 }
 def init_db():
     conn = sqlite3.connect("products.db")
