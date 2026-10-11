@@ -660,8 +660,8 @@ async def daily_gift_handler(callback_query: CallbackQuery):
         "👤 Spin Limit: 1 spin per 24 hours"
     )
 
-        InlineKeyboardButton(text="Spin Now!", callback_data="spin_now", style="success")
-        InlineKeyboardButton(text="Back to Menu", callback_data="main_menu", style="danger")
+    InlineKeyboardButton(text="Spin Now!", callback_data="spin_now", style="success")
+    InlineKeyboardButton(text="Back to Menu", callback_data="main_menu", style="danger")
 
  
     reply_markup = InlineKeyboardMarkup(keyboard)
