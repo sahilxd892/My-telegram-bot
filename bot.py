@@ -67,7 +67,7 @@ plans_db = {
     "150": [{"plan_name": "1 HOURS", "price": 10.00}, {"plan_name": "6 HOURS", "price": 40.00}],
     "136": [{"plan_name": "3 DAYS", "price": 180.00}, {"plan_name": "7 DAYS", "price": 300.00}],
     "155": [{"plan_name": "12 HOURS", "price": 90.00}, {"plan_name": "1 DAYS", "price": 150.00}],
-    "159": [{"plan_name": "1 day — ", "price": 99.00}],
+    "159": [{"plan_name": "1 day", "price": 99.00}],
     "151": [{"plan_name": "1 DAYS", "price": 50.00}, {"plan_name": "7 DAYS", "price": 250.00}],
     "66": [{"plan_name": "12 HOURS", "price": 60.00}, {"plan_name": "3 DAYS", "price": 200.00}],
     "155": [{"plan_name": "1 HOURS", "price": 5.00}, {"plan_name": "1 DAYS", "price": 30.00}],
