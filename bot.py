@@ -67,7 +67,7 @@ plans_db = {
     "150": [{"plan_name": "1 HOURS", "price": 10.00}, {"plan_name": "6 HOURS", "price": 40.00}],
     "136": [{"plan_name": "3 DAYS", "price": 180.00}, {"plan_name": "7 DAYS", "price": 300.00}],
     "155": [{"plan_name": "12 HOURS", "price": 90.00}, {"plan_name": "1 DAYS", "price": 150.00}],
-    "159": [{"plan_name": "1 HOURS", "price": 25.00}],
+    "159": [{"plan_name": "1 day — ", "price": 99.00}],
     "151": [{"plan_name": "1 DAYS", "price": 50.00}, {"plan_name": "7 DAYS", "price": 250.00}],
     "66": [{"plan_name": "12 HOURS", "price": 60.00}, {"plan_name": "3 DAYS", "price": 200.00}],
     "155": [{"plan_name": "1 HOURS", "price": 5.00}, {"plan_name": "1 DAYS", "price": 30.00}],
@@ -650,23 +650,7 @@ async def process_buy_product(call: types.CallbackQuery):
 
 
 
-@router.callback_query(F.data == "menu_daily_gift")
-async def daily_gift_handler(callback_query: CallbackQuery):
-    text = (
-        f"<blockquote>🎁 Daily Lucky Spin Wheel </blockquote>\n\n"
-        "Spin the wheel once every 24 hours "
-        "and win free balance credited instantly to your wallet!\n\n"
-        "💸 Winning Range: ₹0.00 to ₹1.00\n"
-        "👤 Spin Limit: 1 spin per 24 hours"
-    )
 
-    InlineKeyboardButton(text="Spin Now!", callback_data="spin_now", style="success")
-    InlineKeyboardButton(text="Back to Menu", callback_data="main_menu", style="danger")
-
- 
-    reply_markup = InlineKeyboardMarkup(keyboard)
-
-    await callback_query.message.answer(text=text, reply_markup=reply_markup, parse_mode="Markdown")
         
 
 
