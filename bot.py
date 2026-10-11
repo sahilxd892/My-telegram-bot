@@ -195,27 +195,33 @@ def main_menu_kb() -> InlineKeyboardMarkup:
 
     return kb
 
-# यहाँ आप अपने कमान्ड हैंडर्स जोड़ सकते हैं
+def main_menu_text(user_id: int) -> str:
+    # Always fetch the latest committed balance whenever the menu is shown.
+    current_balance = get_balance(user_id)
+    return (
+        "<blockquote><b>🏪 SAHIL BHAI STORE 🔓</b></blockquote>\n\n"
+        "〰️〰️〰️〰️〰️〰️〰️〰️〰️〰️\n\n"
+        "┝🛍️ Buy Now : All Key Purchase & Instant Delivery\n"
+        "┝📢 Check Update : Check Setup Video And Update Apk\n"
+        "┝🪙 Add Balance : Deposit Balance & Secure Auto-Add Payment System\n"
+        "┝🆔 My Profile + All History : Check Your Account Information + All History\n"
+        "┝👥 Refer And Earn : Share Refer Link & Earn Money\n"
+        "┝🎬  How To Use Bot : View Tutorial And Work This Bot\n"
+        "┝📨 Support : Bot Problem Fixed For Support Admin\n"
+        "┝🎁 Daily Gift : Free Spin and win random balance daily, Only one spin every 24 hours.\n\n"
+        "〰️〰️〰️〰️〰️〰️〰️〰️〰️〰️\n\n"
+        f"<blockquote><b>💰 Your Balance: 🪙₹{current_balance:.2f}</b></blockquote>\n\n"
+        "<b>👇 Select an option from the menu below:</b>"
+    )
+
+
 @dp.message(Command("start"))
 async def send_welcome(message: types.Message):
-    current_balance = get_balance(message.from_user.id)
     await message.answer(
-     "<blockquote><b>🏪 SAHIL BHAI STORE 🔓</b></blockquote>\n\n"
-     "〰️〰️〰️〰️〰️〰️〰️〰️〰️〰️\n\n"
-     "┝🛍️ Buy Now : All Key Purchase & Instant Delivery\n"
-     "┝📢 Check Update : Check Setup Video And Update Apk\n"
-     "┝🪙 Add Balance : Deposit Balance & Secure Auto-Add Payment System\n"
-     "┝🆔 My Profile + All History : Check Your Account Information + All History\n"
-     "┝👥 Refer And Earn : Share Refer Link & Earn Money\n"
-     "┝🎬  How To Use Bot : View Tutorial And Work This Bot\n"
-     "┝📨 Support : Bot Problem Fixed For Support Admin\n"
-     "┝🎁 Daily Gift : Free Spin and win random balance daily, Only one spin every 24 hours.\n\n"
-     "〰️〰️〰️〰️〰️〰️〰️〰️〰️〰️\n\n"
-     f"<blockquote><b>💰 Your Balance: 🪙₹{current_balance:.2f}</b></blockquote>\n\n"  
-     "<b>👇 Select an option from the menu below:</b>",
-     parse_mode="HTML",
-     reply_markup=main_menu_kb(),
- )
+        main_menu_text(message.from_user.id),
+        parse_mode="HTML",
+        reply_markup=main_menu_kb(),
+    )
 
 
 def update_kb():
@@ -376,35 +382,40 @@ async def menu_support(call: types.CallbackQuery):
  reply_markup=support_kb(),
  )
  await call.answer()
+async def return_to_main_menu(call: types.CallbackQuery):
+    """Remove the submenu when possible and always show a freshly fetched balance."""
+    user_id = call.from_user.id
+    menu_text = main_menu_text(user_id)  # reads the latest committed balance
+
+    # Prefer deleting the old submenu so it cannot remain above the new menu.
+    try:
+        await call.message.delete()
+    except Exception as delete_exc:
+        logging.info("Submenu delete failed; trying to replace it: %s", delete_exc)
+        # If Telegram refuses deletion, replace that same message to avoid stale content.
+        try:
+            await call.message.edit_text(
+                text=menu_text,
+                parse_mode="HTML",
+                reply_markup=main_menu_kb(),
+            )
+            return
+        except Exception as edit_exc:
+            logging.warning("Submenu edit also failed; sending a fresh menu: %s", edit_exc)
+
+    # Message was deleted, or both delete/edit were unavailable.
+    await call.bot.send_message(
+        chat_id=call.message.chat.id,
+        text=menu_text,
+        parse_mode="HTML",
+        reply_markup=main_menu_kb(),
+    )
+
+
 @router.callback_query(F.data == "menu_back")
 async def process_menu_back(call: types.CallbackQuery):
     await call.answer()
-    current_balance = get_balance(call.from_user.id)
-
-    # Deleting an old message can fail (already deleted / no permission).
-    # Still show the main menu instead of leaving the user stuck.
-    try:
-        await call.message.delete()
-    except Exception:
-        logging.exception("Could not delete previous menu message; sending main menu anyway")
-
-    await call.message.answer(
-    "<blockquote><b>🏪 SAHIL BHAI STORE 🔓</b></blockquote>\n\n"
-    "〰️〰️〰️〰️〰️〰️〰️〰️〰️〰️\n\n"
-    "┝🛍️ Buy Now : All Key Purchase & Instant Delivery\n"
-    "┝📢 Check Update : Check Setup Video And Update Apk\n"
-    "┝🪙 Add Balance : Deposit Balance & Secure Auto-Add Payment System\n"
-    "┝🆔 My Profile + All History : Check Your Account Information + All History\n"
-    "┝👥 Refer And Earn : Share Refer Link & Earn Money\n"
-    "┝🎬  How To Use Bot : View Tutorial And Work This Bot\n"
-    "┝📨 Support : Bot Problem Fixed For Support Admin\n"
-    "┝🎁 Daily Gift : Free Spin and win random balance daily, Only one spin every 24 hours.\n\n"
-    "〰️〰️〰️〰️〰️〰️〰️〰️〰️〰️\n\n"
-    f"<blockquote><b>💰 Your  Balance: 🪙₹{current_balance:.2f}</b></blockquote>\n\n"  
-    "<b>👇 Select an option from the menu below:</b>",
-    parse_mode="HTML",
-    reply_markup=main_menu_kb(),
- )
+    await return_to_main_menu(call)
 
 import random
 
@@ -608,28 +619,7 @@ from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
 @router.callback_query(F.data == "main_menu")
 async def process_main_menu(call: types.CallbackQuery):
     await call.answer()
-    current_balance = get_balance(call.from_user.id)
-    try:
-        await call.message.delete()
-    except Exception:
-        logging.exception("Could not delete previous message; sending main menu anyway")
-    await call.message.answer(
-    "<blockquote><b>🏪 SAHIL BHAI STORE 🔓</b></blockquote>\n\n"
-     "〰️〰️〰️〰️〰️〰️〰️〰️〰️〰️\n\n"
-     "┝🛍️ Buy Now : All Key Purchase & Instant Delivery\n"
-     "┝📢 Check Update : Check Setup Video And Update Apk\n"
-     "┝🪙 Add Balance : Deposit Balance & Secure Auto-Add Payment System\n"
-     "┝🆔 My Profile + All History : Check Your Account Information + All History\n"
-     "┝👥 Refer And Earn : Share Refer Link & Earn Money\n"
-     "┝🎬  How To Use Bot : View Tutorial And Work This Bot\n"
-     "┝📨 Support : Bot Problem Fixed For Support Admin\n"
-     "┝🎁 Daily Gift : Free Spin and win random balance daily, Only one spin every 24 hours.\n\n"
-     "〰️〰️〰️〰️〰️〰️〰️〰️〰️〰️\n\n"
-     f"<blockquote><b>💰 Your Balance: 🪙₹{current_balance:.2f}</b></blockquote>\n\n"  
-     "<b>👇 Select an option from the menu below:</b>",
-     parse_mode="HTML",
-     reply_markup=main_menu_kb(),
- )
+    await return_to_main_menu(call)
 
 @router.callback_query(F.data == "menu_shop")
 async def process_menu_shop(call: types.CallbackQuery):
