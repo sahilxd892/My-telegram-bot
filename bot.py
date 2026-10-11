@@ -411,7 +411,7 @@ from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
 @router.callback_query(F.data == "menu_refer")
 async def refer_and_earn(call: types.CallbackQuery):
     user_id = call.from_user.id
-    bot_username = "Sahilbhaistorebhaibot"
+    bot_username = "Sahil6171_bot"
     referral_link = f"https://t.me/{bot_username}?start=ref{user_id}"
 
     message_text = (
