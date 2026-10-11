@@ -1,4 +1,4 @@
-import sqlite3
+ import sqlite3
 import logging
 from datetime import datetime, timedelta
 import time
@@ -709,25 +709,53 @@ async def process_buy_product(call: types.CallbackQuery):
 import random
 
 def process_spin(user_id):
+    """Atomically claim the daily spin and credit its reward to the wallet."""
     current_time = time.time()
-    conn = sqlite3.connect("products.db")
-    cursor = conn.cursor()
-    cursor.execute("SELECT last_spin_time FROM daily_spin WHERE user_id = ?", (user_id,))
-    result = cursor.fetchone()
-    last_spin_time = result[0] if result else 0
     cooldown = 24 * 3600
-    
-    if current_time - last_spin_time >= cooldown:
-        amount = round(random.uniform(0.0, 1.0), 2)
-        cursor.execute("INSERT OR REPLACE INTO daily_spin (user_id, last_spin_time) VALUES (?, ?)", (user_id, current_time))
+
+    conn = sqlite3.connect("products.db", timeout=10)
+    try:
+        cursor = conn.cursor()
+        cursor.execute("BEGIN IMMEDIATE")
+        cursor.execute(
+            "SELECT last_spin_time FROM daily_spin WHERE user_id = ?",
+            (user_id,),
+        )
+        result = cursor.fetchone()
+        last_spin_time = result[0] if result else 0
+
+        if current_time - last_spin_time < cooldown:
+            remaining_time = cooldown - (current_time - last_spin_time)
+            conn.rollback()
+            return {"status": "cooldown", "remaining_time": remaining_time}
+
+        # Keep the reward above zero so the user does not win ₹0.00.
+        amount = round(random.uniform(0.01, 1.00), 2)
+
+        cursor.execute(
+            """
+            INSERT INTO users (user_id, balance) VALUES (?, ?)
+            ON CONFLICT(user_id) DO UPDATE SET balance = balance + excluded.balance
+            """,
+            (user_id, amount),
+        )
+        cursor.execute(
+            """
+            INSERT INTO daily_spin (user_id, last_spin_time) VALUES (?, ?)
+            ON CONFLICT(user_id) DO UPDATE SET last_spin_time = excluded.last_spin_time
+            """,
+            (user_id, current_time),
+        )
+        cursor.execute("SELECT balance FROM users WHERE user_id = ?", (user_id,))
+        new_balance = cursor.fetchone()[0]
         conn.commit()
+        return {"status": "won", "amount": amount, "balance": new_balance}
+    except Exception:
+        conn.rollback()
+        raise
+    finally:
         conn.close()
-        return {"status": "won", "amount": amount}
-    else:
-        conn.close()
-        remaining_time = cooldown - (current_time - last_spin_time)
-        return {"status": "cooldown", "remaining_time": remaining_time} 
-        
+
 @router.callback_query(F.data == "spin_now")
 async def spin_now(call: types.CallbackQuery):
     user_id = call.from_user.id
@@ -735,14 +763,15 @@ async def spin_now(call: types.CallbackQuery):
 
     if status_result["status"] == "won":
         amount = status_result["amount"]
-        current_balance = get_balance(user_id)
-        new_balance = current_balance + amount
-        update_balance(user_id, amount)
-        
-        text = (f"<blockquote><b>🎁  Daily Gift Spin Winner! </b></blockquote>\n\n"
-                f"You won a randomized claim of: <b>🪙₹{amount:.2f}</b>\n\n"
-                f"Updated Wallet: <b>🪙₹{new_balance:.2f}</b>")
-                
+        # process_spin already credited the wallet in the same database transaction.
+        new_balance = status_result["balance"]
+
+        text = (
+            f"<blockquote><b>🎁 Daily Gift Spin Winner!</b></blockquote>\\n\\n"
+            f"You won: <b>🪙₹{amount:.2f}</b>\\n\\n"
+            f"Updated Wallet: <b>🪙₹{new_balance:.2f}</b>"
+        )
+
         keyboard = types.InlineKeyboardMarkup(inline_keyboard=[
             [types.InlineKeyboardButton(text="Back to Menu", callback_data="menu_back", style="danger")]
         ])
