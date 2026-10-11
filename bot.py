@@ -850,7 +850,7 @@ async def back_to_plans_handler(call: types.CallbackQuery):
     await call.answer()
 
 
-@router.callback_query(F.data == "main_menu")
+@router.callback_query(F.data == "menu_daily_gift")
 async def daily_gift_handler(callback_query: CallbackQuery):
     text = (
         f"<blockquote>🎁 Daily Lucky Spin Wheel </blockquote>\n\n"
@@ -862,7 +862,7 @@ async def daily_gift_handler(callback_query: CallbackQuery):
 
     keyboard = [
         [InlineKeyboardButton("Spin Now!", callback_data="spin_now", style="success")],
-        [InlineKeyboardButton("Back to Menu", callback_data="menu_daily_gift", style="danger")]
+        [InlineKeyboardButton("Back to Menu", callback_data="main_menu", style="danger")]
     ]
     reply_markup = InlineKeyboardMarkup(keyboard)
 
