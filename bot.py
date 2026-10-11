@@ -2,6 +2,7 @@ import sqlite3
 import logging
 from datetime import datetime, timedelta
 import time
+import random
 import asyncio
 from typing import Optional
 from aiogram import Bot, Dispatcher, types
@@ -16,32 +17,6 @@ from aiogram import types
 from aiogram import F, Router, types
 import aiohttp
 from aiogram.types import CallbackQuery
-
-
-def init_db():
-    conn = sqlite3.connect("products.db")
-    cursor = conn.cursor()
-    cursor.execute(
-        """
-        CREATE TABLE IF NOT EXISTS products (
-            id TEXT PRIMARY KEY,
-            name TEXT NOT NULL,
-            price REAL NOT NULL
-        )
-    """
-    )
-    conn.commit()
-    conn.close()
-
-def update_balance(user_id, amount):
-    conn = sqlite3.connect("products.db")
-    cursor = conn.cursor()
-    cursor.execute(
-        "UPDATE users SET balance = balance + ? WHERE user_id = ?",
-        (amount, user_id),
-    )
-    conn.commit()
-    conn.close()
 
 
 products_db = {
@@ -84,6 +59,14 @@ def init_db():
         CREATE TABLE IF NOT EXISTS users (
             user_id INTEGER PRIMARY KEY,
             balance REAL DEFAULT 0.0
+        )
+    """)
+
+    cursor.execute("""
+        CREATE TABLE IF NOT EXISTS products (
+            id TEXT PRIMARY KEY,
+            name TEXT NOT NULL,
+            price REAL NOT NULL
         )
     """)
 
@@ -709,40 +692,62 @@ async def process_buy_product(call: types.CallbackQuery):
 import random
 
 def process_spin(user_id):
+    """Spin time save + balance credit एक ही transaction में (या दोनों होंगे या कोई नहीं)."""
     current_time = time.time()
-    conn = sqlite3.connect("products.db")
-    cursor = conn.cursor()
-    cursor.execute("SELECT last_spin_time FROM daily_spin WHERE user_id = ?", (user_id,))
-    result = cursor.fetchone()
-    last_spin_time = result[0] if result else 0
     cooldown = 24 * 3600
-    
-    if current_time - last_spin_time >= cooldown:
-        amount = round(random.uniform(0.0, 1.0), 2)
-        cursor.execute("INSERT OR REPLACE INTO daily_spin (user_id, last_spin_time) VALUES (?, ?)", (user_id, current_time))
-        conn.commit()
+    conn = sqlite3.connect("products.db", timeout=10)
+    try:
+        cursor = conn.cursor()
+        cursor.execute("BEGIN IMMEDIATE")  # double-tap / race रोकने के लिए lock
+        cursor.execute("SELECT last_spin_time FROM daily_spin WHERE user_id = ?", (user_id,))
+        result = cursor.fetchone()
+        last_spin_time = result[0] if result and result[0] else 0
+
+        if current_time - last_spin_time >= cooldown:
+            amount = round(random.uniform(0.0, 1.0), 2)
+            cursor.execute(
+                "INSERT OR REPLACE INTO daily_spin (user_id, last_spin_time) VALUES (?, ?)",
+                (user_id, int(current_time)),
+            )
+            # balance को ADD करो, कभी reset/overwrite नहीं
+            cursor.execute(
+                "INSERT INTO users (user_id, balance) VALUES (?, ?) "
+                "ON CONFLICT(user_id) DO UPDATE SET balance = balance + excluded.balance",
+                (user_id, amount),
+            )
+            cursor.execute("SELECT balance FROM users WHERE user_id = ?", (user_id,))
+            new_balance = cursor.fetchone()[0]
+            conn.commit()
+            return {"status": "won", "amount": amount, "new_balance": new_balance}
+        else:
+            conn.rollback()
+            return {"status": "cooldown", "remaining_time": cooldown - (current_time - last_spin_time)}
+    except Exception:
+        conn.rollback()
+        raise
+    finally:
         conn.close()
-        return {"status": "won", "amount": amount}
-    else:
-        conn.close()
-        remaining_time = cooldown - (current_time - last_spin_time)
-        return {"status": "cooldown", "remaining_time": remaining_time} 
-        
+
+
+@router.callback_query(F.data == "ignore")
+async def ignore_cb(call: types.CallbackQuery):
+    await call.answer("⏳ अभी स्पिन उपलब्ध नहीं है", show_alert=False)
+
+
 @router.callback_query(F.data == "spin_now")
 async def spin_now(call: types.CallbackQuery):
+    await call.answer()
     user_id = call.from_user.id
     status_result = process_spin(user_id)
 
     if status_result["status"] == "won":
         amount = status_result["amount"]
-        current_balance = get_balance(user_id)
-        new_balance = current_balance + amount
-        update_balance(user_id, amount)
-        
+        new_balance = status_result["new_balance"]
+
         text = (f"<blockquote><b>🎁  Daily Gift Spin Winner! </b></blockquote>\n\n"
                 f"You won a randomized claim of: <b>🪙₹{amount:.2f}</b>\n\n"
                 f"Updated Wallet: <b>🪙₹{new_balance:.2f}</b>")
-                
+
         keyboard = types.InlineKeyboardMarkup(inline_keyboard=[
             [types.InlineKeyboardButton(text="Back to Menu", callback_data="menu_back", style="danger")]
         ])
@@ -750,16 +755,21 @@ async def spin_now(call: types.CallbackQuery):
         remaining_time = status_result["remaining_time"]
         hours = int(remaining_time // 3600)
         minutes = int((remaining_time % 3600) // 60)
-        
+
         text = (
-    f"<b><blockquote>🎁 Daily Lucky Spin Wheel </blockquote></b>\n\n"
-    "〰️〰️〰️〰️〰️〰️〰️〰️〰️〰️\n\n"
-    "Spin the wheel once every 24 hours and win free balance credited instantly to your wallet!\n\n"
-    "<b>┝🪙Winning Range:</b> ₹0.00 to ₹1.00\n"
-    "<b>┝⏳Spin Limit:</b> 1 spin per 24 hours\n\n"
-    f"<b><blockquote>⏳You have already claimed today's spin! </blockquote></b>\n"
-    f"Please wait another {hours}h {minutes}m before trying to spin the wheel again."
-)
+            f"<b><blockquote>🎁 Daily Lucky Spin Wheel </blockquote></b>\n\n"
+            "〰️〰️〰️〰️〰️〰️〰️〰️〰️〰️\n\n"
+            "Spin the wheel once every 24 hours and win free balance credited instantly to your wallet!\n\n"
+            "<b>┝🪙Winning Range:</b> ₹0.00 to ₹1.00\n"
+            "<b>┝⏳Spin Limit:</b> 1 spin per 24 hours\n\n"
+            f"<b><blockquote>⏳You have already claimed today's spin! </blockquote></b>\n"
+            f"Please wait another {hours}h {minutes}m before trying to spin the wheel again."
+        )
+        keyboard = types.InlineKeyboardMarkup(inline_keyboard=[
+            [types.InlineKeyboardButton(text=f"Lock ({hours}h {minutes}m)", callback_data="ignore", style="success")],
+            [types.InlineKeyboardButton(text="Back to Menu", callback_data="menu_back", style="danger")]
+        ])
+
     await call.message.edit_text(text, reply_markup=keyboard, parse_mode="HTML")
 
 
@@ -965,3 +975,4 @@ if __name__ == '__main__':
     init_db()
     dp.include_router(router)
     asyncio.run(dp.start_polling(bot)) 
+ 
