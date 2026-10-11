@@ -174,7 +174,7 @@ def get_menu_message(user_id: int):
         conn.close()
 
 # बोट सेटअप
-API_TOKEN = '8869365595:AAE91YUbPRqMg-OF1h5LW2M6MsDKoTLPIaQ'
+API_TOKEN = '8658970425:AAFBUFFcSUHqmY_-oMtvqJnzFz_6vSFdGw0'
 logging.basicConfig(level=logging.INFO)
 bot = Bot(token=API_TOKEN)
 dp = Dispatcher()
@@ -269,30 +269,8 @@ def main_menu_text(user_id: int) -> str:
 async def send_welcome(message: types.Message):
     user_id = message.from_user.id
 
-    # Remove the previous bot menu; if Telegram refuses deletion, replace it in place.
-    previous = get_menu_message(user_id)
-    if previous:
-        previous_chat_id, previous_message_id = previous
-        try:
-            await bot.delete_message(
-                chat_id=previous_chat_id,
-                message_id=previous_message_id,
-            )
-        except Exception as delete_exc:
-            logging.info("Previous menu delete failed during /start: %s", delete_exc)
-            try:
-                edited = await bot.edit_message_text(
-                    chat_id=previous_chat_id,
-                    message_id=previous_message_id,
-                    text=main_menu_text(user_id),
-                    parse_mode="HTML",
-                    reply_markup=main_menu_kb(),
-                )
-                save_menu_message(user_id, previous_chat_id, edited.message_id)
-                return
-            except Exception as edit_exc:
-                logging.info("Previous menu edit failed during /start: %s", edit_exc)
-
+    # Do not delete or edit any previous message when /start is sent.
+    # Always send a new main-menu message with the latest database balance.
     sent = await message.answer(
         main_menu_text(user_id),
         parse_mode="HTML",
