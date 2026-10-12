@@ -439,7 +439,7 @@ async def process_pay_upi(callback_query: types.CallbackQuery, state: FSMContext
     upi_link = f"upi://pay?pa={upi_id}&am={amount}&cu=INR"
     
     qr = qrcode.QRCode(
-    version=None,
+    version=5,
     error_correction=qrcode.constants.ERROR_CORRECT_L,
     box_size=10,
     border=4,
@@ -636,7 +636,7 @@ async def process_buy_product(call: types.CallbackQuery):
 
     message_text = (
         f"<blockquote><b>🛒{product_name}</b></blockquote>\n"
-        f"<blockquote>👥Your Account Tier:👥 {account_tier}</blockquote>\n"
+        f"<blockquote>👥 Your Account Tier: 👥 {account_tier}</blockquote>\n"
         f"<blockquote>🛍️Choose your access plan:</blockquote>\n\n"
         f"{plans_text}"
     )
