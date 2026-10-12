@@ -109,6 +109,29 @@ def update_balance(user_id: int, amount: float):
     conn.commit()
     conn.close()
 
+# लास्ट स्पिन टाइम अपडेट करने का फंक्शन
+def update_last_spin_time(user_id: int):
+    conn = sqlite3.connect("products.db")
+    cursor = conn.cursor()
+    cursor.execute(
+        """
+        INSERT OR REPLACE INTO daily_spin (user_id, last_spin_time)
+        VALUES (?, ?)
+    """,
+        (user_id, int(datetime.utcnow().timestamp())),
+    )
+    conn.commit()
+    conn.close()
+
+
+# लास्ट स्पिन टाइम चेक करने का फंक्शन
+def get_last_spin_time(user_id: int) -> int:
+    conn = sqlite3.connect("products.db")
+    cursor = conn.cursor()
+    cursor.execute(```
+```python
+# लास्ट स्पिन टाइम अपडेट करने का फंक्शन
+def
 
 
 # Balance fetch karne ka function
