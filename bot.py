@@ -686,6 +686,70 @@ async def daily_gift_handler(callback_query: types.CallbackQuery):
     await callback_query.answer()
 
 
+@router.callback_query(F.data == "spin_now")
+async def process_spin(callback_query: types.CallbackQuery):
+    user_id = callback_query.from_user.id
+    current_time = int(datetime.utcnow().timestamp())
+    last_spin_time = get_last_spin_time(user_id)
+
+    seconds_in_day = 86400
+
+    if current_time - last_spin_time < seconds_in_day:
+        time_left = seconds_in_day - (current_time - last_spin_time)
+        hours_left = int(time_left // 3600)
+        minutes_left = int((time_left % 3600) // 60)
+
+        keyboard = InlineKeyboardMarkup(
+            inline_keyboard=[
+                [
+                    InlineKeyboardButton(
+                        text=f"🔒 Lock ({hours_left}h {minutes_left}m)",
+                        callback_data="lock_btn", style="success"
+                    )
+                ],
+                [
+                    InlineKeyboardButton(
+                        text="⬅️ Back to Menu", callback_data="main_menu"‚ style="danger"
+                    )
+                ],
+            ]
+        )
+
+        await callback_query.message.edit_text(
+            text="You have already claimed today's spin! Please wait.",
+            reply_markup=keyboard,
+            parse_mode="HTML",
+        )
+        await callback_query.answer()
+        return
+
+    won_amount = round(random.uniform(0.00, 1.00), 2)
+
+    update_user_balance(user_id, won_amount)
+    update_last_spin_time(user_id)
+    new_balance = get_balance(user_id)
+
+    text = (
+        "<blockquote>Daily Lucky Spin Wheel</blockquote>\n\n"
+        f"You won a randomized claim of: 🪙 ₹{won_amount:.2f}\n"
+        f"<b>Updated Wallet:</b> 🪙 ₹{new_balance:.2f}\n\n"
+    )
+
+    keyboard = InlineKeyboardMarkup(
+        inline_keyboard=[
+            [
+                InlineKeyboardButton(
+                    text="⬅️ Back to Menu",
+                    callback_data="main_menu",
+                )
+            ]
+        ]
+    )
+
+    await callback_query.message.edit_text(
+        text=text, parse_mode="HTML", reply_markup=keyboard
+    )
+    await callback_query.answer()
     
     
 
