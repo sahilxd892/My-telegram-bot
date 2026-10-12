@@ -709,7 +709,7 @@ async def process_spin(callback_query: types.CallbackQuery):
                 ],
                 [
                     InlineKeyboardButton(
-                        text="⬅️ Back to Menu", callback_data="main_menu"‚ style="danger"
+                        text="⬅️ Back to Menu", callback_data="main_menu", style="danger"
                     )
                 ],
             ]
