@@ -110,32 +110,7 @@ def update_balance(user_id: int, amount: float):
     conn.commit()
     conn.close()
 
-# लास्ट स्पिन टाइम अपडेट करने का फंक्शन
-def update_last_spin_time(user_id: int):
-    conn = sqlite3.connect("products.db")
-    cursor = conn.cursor()
-    cursor.execute(
-        """
-        INSERT OR REPLACE INTO daily_spin (user_id, last_spin_time)
-        VALUES (?, ?)
-    """,
-        (user_id, int(datetime.utcnow().timestamp())),
-    )
-    conn.commit()
-    conn.close()
 
-
-# लास्ट स्पिन टाइम चेक करने का फंक्शन
-def get_last_spin_time(user_id: int) -> int:
-    conn = sqlite3.connect("products.db")
-    cursor = conn.cursor()
-    cursor.execute(
-    "SELECT last_spin_time FROM daily_spin WHERE user_id = ?",
-    (user_id,),
-    )
-    result = cursor.fetchone()
-    conn.close()
-    return result[0] if result else 0
 
 
 
@@ -683,111 +658,7 @@ async def process_buy_product(call: types.CallbackQuery):
 
 
 
-@router.callback_query(F.data == "menu_daily_gift")
-async def process_daily_gift(call: types.CallbackQuery):
-    await call.answer()
-    user_id = call.from_user.id
-    current_time = time.time()
-    
-    conn = sqlite3.connect("products.db")
-    cursor = conn.cursor()
-    cursor.execute("SELECT last_spin_time FROM daily_spin WHERE user_id = ?", (user_id,))
-    result = cursor.fetchone()
-    last_spin_time = result[0] if result else 0
-    cooldown = 24 * 3600
-    conn.close()
 
-    if current_time - last_spin_time >= cooldown:
-        text = (f"<blockquote><b>🎁 Daily Lucky Spin Wheel </b></blockquote>\n\n"
-                f"Spin the wheel once every 24 hours and win free balance credited instantly to your wallet!\n\n"
-                f"┝ 🪙 Winning Range: ₹0.00 to ₹1.00\n"
-                f"┝ ⏳ Spin Limit: 1 spin per 24 hours\n\n"
-                f"👇 Click the button below to try your luck:")
-                
-        keyboard = types.InlineKeyboardMarkup(inline_keyboard=[
-            [types.InlineKeyboardButton(text="Spin Now!", callback_data="spin_now", style="success")],
-            [types.InlineKeyboardButton(text="Back to Menu", callback_data="menu_back", style="danger")]
-        ])
-    else:
-        remaining_time = cooldown - (current_time - last_spin_time)
-        hours = int(remaining_time // 3600)
-        minutes = int((remaining_time % 3600) // 60)
-        
-        text = (
-        f"<b><blockquote>🎁 Daily Lucky Spin Wheel </blockquote></b>\n\n"
-        "〰️〰️〰️〰️〰️〰️〰️〰️〰️〰️\n\n"
-        "Spin the wheel once every 24 hours and win free balance credited instantly to your wallet!\n\n"
-        "<b>┝🪙Winning Range:</b> ₹0.00 to ₹1.00\n"
-        "<b>┝⏳Spin Limit:</b> 1 spin per 24 hours\n\n"
-        f"<b><blockquote>⏳You have already claimed today's spin! </blockquote></b>\n"
-        f"Please wait another {hours}h {minutes}m before trying to spin the wheel again."
-)
-                
-        keyboard = types.InlineKeyboardMarkup(inline_keyboard=[
-            [types.InlineKeyboardButton(text=f"Lock ({hours}h {minutes}m)", callback_data="ignore", style="success")],
-            [types.InlineKeyboardButton(text="Back to Menu", callback_data="menu_back", style="danger")]
-        ])
-
-    await call.message.edit_text(text, reply_markup=keyboard, parse_mode="HTML")
-    
-    
-    
-    
-    
-    
-    def process_spin(user_id):
-    current_time = time.time()
-    conn = sqlite3.connect("products.db")
-    cursor = conn.cursor()
-    cursor.execute("SELECT last_spin_time FROM daily_spin WHERE user_id = ?", (user_id,))
-    result = cursor.fetchone()
-    last_spin_time = result[0] if result else 0
-    cooldown = 24 * 3600
-    
-    if current_time - last_spin_time >= cooldown:
-        amount = round(random.uniform(0.0, 1.0), 2)
-        cursor.execute("INSERT OR REPLACE INTO daily_spin (user_id, last_spin_time) VALUES (?, ?)", (user_id, current_time))
-        conn.commit()
-        conn.close()
-        return {"status": "won", "amount": amount}
-    else:
-        conn.close()
-        remaining_time = cooldown - (current_time - last_spin_time)
-        return {"status": "cooldown", "remaining_time": remaining_time} 
-        
-@router.callback_query(F.data == "spin_now")
-async def spin_now(call: types.CallbackQuery):
-    user_id = call.from_user.id
-    status_result = process_spin(user_id)
-
-    if status_result["status"] == "won":
-        amount = status_result["amount"]
-        current_balance = get_balance(user_id)
-        new_balance = current_balance + amount
-        update_balance(user_id, amount)
-        
-        text = (f"<blockquote><b>🎁  Daily Gift Spin Winner! </b></blockquote>\n\n"
-                f"You won a randomized claim of: <b>🪙₹{amount:.2f}</b>\n\n"
-                f"Updated Wallet: <b>🪙₹{new_balance:.2f}</b>")
-                
-        keyboard = types.InlineKeyboardMarkup(inline_keyboard=[
-            [types.InlineKeyboardButton(text="Back to Menu", callback_data="menu_back", style="danger")]
-        ])
-    else:
-        remaining_time = status_result["remaining_time"]
-        hours = int(remaining_time // 3600)
-        minutes = int((remaining_time % 3600) // 60)
-        
-        text = (
-    f"<b><blockquote>🎁 Daily Lucky Spin Wheel </blockquote></b>\n\n"
-    "〰️〰️〰️〰️〰️〰️〰️〰️〰️〰️\n\n"
-    "Spin the wheel once every 24 hours and win free balance credited instantly to your wallet!\n\n"
-    "<b>┝🪙Winning Range:</b> ₹0.00 to ₹1.00\n"
-    "<b>┝⏳Spin Limit:</b> 1 spin per 24 hours\n\n"
-    f"<b><blockquote>⏳You have already claimed today's spin! </blockquote></b>\n"
-    f"Please wait another {hours}h {minutes}m before trying to spin the wheel again."
-)
-    await call.message.edit_text(text, reply_markup=keyboard, parse_mode="HTML")
 
 
 
