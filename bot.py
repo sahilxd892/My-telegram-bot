@@ -611,7 +611,7 @@ async def process_buy_product(call: types.CallbackQuery):
     keyboard_buttons = []
     plans_text = ""
     for plan in plans:
-        plans_text += f"┝🪙₹{plan['price']:.2f} — ⏳{plan['plan_name']}\n"
+        plans_text += f"<b>┝🪙₹{plan['price']:.2f} — ⏳{plan['plan_name']}</b>\n"
 
     for plan in plans:
         keyboard_buttons.append(
