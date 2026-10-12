@@ -655,7 +655,32 @@ async def process_buy_product(call: types.CallbackQuery):
 
 
 
-        
+@router.callback_query(F.data == "menu_daily_gift")
+async def daily_gift_handler(callback_query: types.CallbackQuery):
+    text = (
+        "<blockquote>🎁Daily Lucky Spin Wheel</blockquote>\n\n"
+        "<i>Spin the wheel once every 24 hours and win free balance credited instantly to your wallet!</i>\n\n"
+        "<b>┝🪙Winning Range:</b> ₹0.00 to ₹1.00\n"
+        "<b>┝⏳Spin Limit:</b> 1 spin per 24 hours\n\n"
+        "<b>👇Click the button below to try your luck:</b>"
+    )
+
+    keyboard = InlineKeyboardMarkup(row_width=1)
+    keyboard.add(
+        InlineKeyboardButton(
+            text="Spin Now!", callback_data="spin_now", style="success"
+        )
+    )
+    keyboard.add(
+        InlineKeyboardButton(
+            text="Back to Menu", callback_data="main_menu", style="danger"
+        )
+    )
+
+    await callback_query.message.edit_text(
+        text=text, parse_mode="HTML", reply_markup=keyboard
+    )
+    await callback_query.answer()        
 
 
     
