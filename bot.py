@@ -128,10 +128,14 @@ def update_last_spin_time(user_id: int):
 def get_last_spin_time(user_id: int) -> int:
     conn = sqlite3.connect("products.db")
     cursor = conn.cursor()
-    cursor.execute(```
-```python
-# लास्ट स्पिन टाइम अपडेट करने का फंक्शन
-def
+    cursor.execute(
+    "SELECT last_spin_time FROM daily_spin WHERE user_id = ?",
+    (user_id,),
+    )
+    result = cursor.fetchone()
+    conn.close()
+    return result[0] if result else 0
+
 
 
 # Balance fetch karne ka function
