@@ -753,14 +753,14 @@ async def process_spin(callback_query: types.CallbackQuery):
 
     won_amount = round(random.uniform(0.00, 1.00), 2)
 
-    update_user_balance(user_id, won_amount)
+    update_balance(user_id, won_amount)
     update_last_spin_time(user_id)
     new_balance = get_balance(user_id)
 
     text = (
         "<blockquote>Daily Lucky Spin Wheel</blockquote>\n\n"
-        f"You won a randomized claim of: 🪙 ₹{won_amount:.2f}\n"
-        f"<b>Updated Wallet:</b> 🪙 ₹{new_balance:.2f}\n\n"
+        f"You won a randomized claim of: 🪙₹{won_amount:.2f}\n"
+        f"<b>Updated Wallet:</b> 🪙₹{new_balance:.2f}\n\n"
     )
 
     keyboard = InlineKeyboardMarkup(
