@@ -439,10 +439,10 @@ async def process_pay_upi(callback_query: types.CallbackQuery, state: FSMContext
     upi_link = f"upi://pay?pa={upi_id}&am={amount}&cu=INR"
     
     qr = qrcode.QRCode(
-    version=6,
+    version=8,
     error_correction=qrcode.constants.ERROR_CORRECT_L,
-    box_size=10,
-    border=2,
+    box_size=5,
+    border=4,
 )
     qr.add_data(upi_link)
     qr.make(fit=True)
