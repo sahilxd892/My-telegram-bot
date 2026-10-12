@@ -72,7 +72,7 @@ plans_db = {
     "66": [{"plan_name": "12 HOURS", "price": 60.00}, {"plan_name": "3 DAYS", "price": 200.00}],
     "155": [{"plan_name": "1 HOURS", "price": 5.00}, {"plan_name": "1 DAYS", "price": 30.00}],
     "63": [{"plan_name": "6 HOURS", "price": 50.00}, {"plan_name": "7 DAYS", "price": 280.00}],
-    "159": [{"plan_name": "1 days - 99.00", "price": 99.00}],
+    "159": [{"plan_name": "1 days - 99.00", "price":99.00}],
 }
 def init_db():
     conn = sqlite3.connect("products.db")
