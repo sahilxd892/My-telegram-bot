@@ -6,7 +6,6 @@ import asyncio
 from typing import Optional
 from aiogram import Bot, Dispatcher, types
 from aiogram.filters import Command
-import random
 from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 from aiogram import F
 import qrcode
@@ -714,71 +713,62 @@ async def daily_gift_handler(callback_query: types.CallbackQuery):
     await callback_query.answer()
 
 
-@router.callback_query(F.data == "spin_now")
-async def process_spin(callback_query: types.CallbackQuery):
-    user_id = callback_query.from_user.id
-    current_time = int(datetime.utcnow().timestamp())
-    last_spin_time = get_last_spin_time(user_id)
 
-    seconds_in_day = 86400
+import random
 
-    if current_time - last_spin_time < seconds_in_day:
-        time_left = seconds_in_day - (current_time - last_spin_time)
-        hours_left = int(time_left // 3600)
-        minutes_left = int((time_left % 3600) // 60)
-
-        keyboard = InlineKeyboardMarkup(
-            inline_keyboard=[
-                [
-                    InlineKeyboardButton(
-                        text=f"🔒 Lock ({hours_left}h {minutes_left}m)",
-                        callback_data="lock_btn", style="success"
-                    )
-                ],
-                [
-                    InlineKeyboardButton(
-                        text="⬅️ Back to Menu", callback_data="main_menu", style="danger"
-                    )
-                ],
-            ]
-        )
-
-        await callback_query.message.edit_text(
-            text="You have already claimed today's spin! Please wait.",
-            reply_markup=keyboard,
-            parse_mode="HTML",
-        )
-        await callback_query.answer()
-        return
-
-    won_amount = round(random.uniform(0.00, 1.00), 2)
-
-    update_balance(user_id, won_amount)
-    update_last_spin_time(user_id)
-    new_balance = get_balance(user_id)
-
-    text = (
-        "<blockquote>Daily Lucky Spin Wheel</blockquote>\n\n"
-        f"You won a randomized claim of: 🪙₹{won_amount:.2f}\n"
-        f"<b>Updated Wallet:</b> 🪙₹{new_balance:.2f}\n\n"
-    )
-
-    keyboard = InlineKeyboardMarkup(
-        inline_keyboard=[
-            [
-                InlineKeyboardButton(
-                    text="⬅️ Back to Menu",
-                    callback_data="main_menu",
-                )
-            ]
-        ]
-    )
-
-    await callback_query.message.edit_text(
-        text=text, parse_mode="HTML", reply_markup=keyboard
-    )
-    await callback_query.answer()
+def process_spin(user_id):
+    current_time = time.time()
+    conn = sqlite3.connect("products.db")
+    cursor = conn.cursor()
+    cursor.execute("SELECT last_spin_time FROM daily_spin WHERE user_id = ?", (user_id,))
+    result = cursor.fetchone()
+    last_spin_time = result[0] if result else 0
+    cooldown = 24 * 3600
     
+    if current_time - last_spin_time >= cooldown:
+        amount = round(random.uniform(0.0, 1.0), 2)
+        cursor.execute("INSERT OR REPLACE INTO daily_spin (user_id, last_spin_time) VALUES (?, ?)", (user_id, current_time))
+        conn.commit()
+        conn.close()
+        return {"status": "won", "amount": amount}
+    else:
+        conn.close()
+        remaining_time = cooldown - (current_time - last_spin_time)
+        return {"status": "cooldown", "remaining_time": remaining_time} 
+        
+@router.callback_query(F.data == "spin_now")
+async def spin_now(call: types.CallbackQuery):
+    user_id = call.from_user.id
+    status_result = process_spin(user_id)
+
+    if status_result["status"] == "won":
+        amount = status_result["amount"]
+        current_balance = get_balance(user_id)
+        new_balance = current_balance + amount
+        update_balance(user_id, amount)
+        
+        text = (f"<blockquote><b>🎁  Daily Gift Spin Winner! </b></blockquote>\n\n"
+                f"You won a randomized claim of: <b>🪙₹{amount:.2f}</b>\n\n"
+                f"Updated Wallet: <b>🪙₹{new_balance:.2f}</b>")
+                
+        keyboard = types.InlineKeyboardMarkup(inline_keyboard=[
+            [types.InlineKeyboardButton(text="Back to Menu", callback_data="menu_back", style="danger")]
+        ])
+    else:
+        remaining_time = status_result["remaining_time"]
+        hours = int(remaining_time // 3600)
+        minutes = int((remaining_time % 3600) // 60)
+        
+        text = (
+    f"<b><blockquote>🎁 Daily Lucky Spin Wheel </blockquote></b>\n\n"
+    "〰️〰️〰️〰️〰️〰️〰️〰️〰️〰️\n\n"
+    "Spin the wheel once every 24 hours and win free balance credited instantly to your wallet!\n\n"
+    "<b>┝🪙Winning Range:</b> ₹0.00 to ₹1.00\n"
+    "<b>┝⏳Spin Limit:</b> 1 spin per 24 hours\n\n"
+    f"<b><blockquote>⏳You have already claimed today's spin! </blockquote></b>\n"
+    f"Please wait another {hours}h {minutes}m before trying to spin the wheel again."
+)
+    await call.message.edit_text(text, reply_markup=keyboard, parse_mode="HTML") 
     
 
 
