@@ -231,16 +231,15 @@ async def process_check_update(call: types.CallbackQuery):
     print("Check Update button pressed")
     update_text = (
         "<blockquote>📢 Follow our updates channel:</blockquote>\n"
-        "👉 Click Here For Setup & Updates 👈\n"
-        "https://t.me/SahilBhaiAllUpdate"
+        '👉 <a href="https://t.me/SahilBhaiAllUpdate">Click Here For Setup & Updates</a> 👈'
     )
 
     try:
         await call.message.edit_text(
-            text=update_text,
-            reply_markup=update_kb(),
-            parse_mode="HTML",
-            disable_web_page_preview=False,
+            text=update_text, 
+            reply_markup=update_kb(), 
+            parse_mode="HTML", 
+            disable_web_page_preview=False
         )
     except TelegramBadRequest:
         pass
