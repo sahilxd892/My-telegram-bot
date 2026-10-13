@@ -124,7 +124,7 @@ def get_balance(user_id: int) -> float:
     return result[0] if result else 0.0
 
 # बोट सेटअप
-API_TOKEN = '8869365595:AAE91YUbPRqMg-OF1h5LW2M6MsDKoTLPIaQ'
+API_TOKEN = '8898385115:AAEU9U8YhJiRLdmTQhZjDFRkS8Aef1tanMA'
 logging.basicConfig(level=logging.INFO)
 bot = Bot(token=API_TOKEN)
 dp = Dispatcher()
@@ -231,15 +231,16 @@ async def process_check_update(call: types.CallbackQuery):
     print("Check Update button pressed")
     update_text = (
         "<blockquote>📢 Follow our updates channel:</blockquote>\n"
-        "🔗 <a href='https://t.me/Sahilbhaiallupdate'><b> Click Here For Setup & Updates</b></a>"
+        "🔗 <a href='t.me/Sahilbhaiallupdate'><b> Click Here For Setup & Updates</b></a>"
     )
     
-    await call.message.edit_text(
-        https://t.me/Sahilbhaiallupdate,
-        text=update_text,
-        parse_mode="HTML",
-        reply_markup=update_kb()
-    )
+    await callback_query.message.edit_text(
+    text=update_text,
+    reply_markup=update_kb(),
+    parse_mode="HTML",
+    disable_web_page_preview=False
+)
+
 
 
 
@@ -317,7 +318,7 @@ from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
 @router.callback_query(F.data == "menu_refer")
 async def refer_and_earn(call: types.CallbackQuery):
     user_id = call.from_user.id
-    bot_username = "Sahilbhaistorebhaibot"
+    bot_username = "Xfdftddxbot"
     referral_link = f"https://t.me/{bot_username}?start=ref{user_id}"
 
     message_text = (
