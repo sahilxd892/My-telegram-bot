@@ -53,7 +53,7 @@ products_db = {
     "62": "DRIP CLIENT APK-MOD",
     "48": "PRIME HOOK APK-MOD",
     "136": "BALA MOD APK MOD",
-    "133": "AIM HACK NON ROOT ",
+    "133": "AIM HACK NON ROOT",
     "150": "DRIP CLIENT WIRE NON ROOT",
     "151": "ABCD PANEL NON ROOT",
     "63": "DRIP CLIENT ROOT",
@@ -62,7 +62,7 @@ products_db = {
     "157": "HEX BLADE  ROOT",
     "66": "XYZ CHEATS ROOT",
     "155": "XYZ CHEATS NON ROOT",
-    "64": "HAXX-CKER ROOT",
+    "64": "HAXX-CKER PRO ROOT",
     "127": "SILENT CHEAT NON ROOT",
     "159": "ZRAX PANEL NON ROOT",
 }
