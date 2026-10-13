@@ -235,11 +235,11 @@ async def process_check_update(call: types.CallbackQuery):
     )
     
     try:
-    await callback_query.message.edit_text(
-        text=update_text,
-        reply_markup=update_kb(),
-        parse_mode="HTML",
-        disable_web_page_preview=False
+        await callback_query.message.edit_text(
+            text=update_text,
+            reply_markup=update_kb(),
+            parse_mode="HTML",
+            disable_web_page_preview=False
     )
 except TelegramBadRequest:
     pass
