@@ -38,11 +38,15 @@ def update_balance(user_id, amount):
     conn = sqlite3.connect("products.db")
     cursor = conn.cursor()
     cursor.execute(
-        "UPDATE users SET balance = balance + ? WHERE user_id = ?",
-        (amount, user_id),
+        """
+    INSERT INTO users (user_id, balance) VALUES (?, ?)
+    ON CONFLICT(user_id) DO UPDATE SET balance = balance + ?
+    """,
+        (user_id, amount, amount),
     )
     conn.commit()
     conn.close()
+
 
 
 products_db = {
