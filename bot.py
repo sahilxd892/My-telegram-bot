@@ -235,7 +235,7 @@ async def process_check_update(call: types.CallbackQuery):
     )
     
     try:
-        await callback_call.message.edit_text(
+        await call.message.edit_text(
             text=update_text,
             reply_markup=update_kb(),
             parse_mode="HTML",
