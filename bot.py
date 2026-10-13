@@ -17,7 +17,7 @@ from aiogram import types
 from aiogram import F, Router, types
 import aiohttp
 from aiogram.types import CallbackQuery
-
+from aiogram.exceptions import TelegramBadRequest
 
 def init_db():
     conn = sqlite3.connect("products.db")
@@ -234,12 +234,15 @@ async def process_check_update(call: types.CallbackQuery):
         "🔗 <a href='t.me/Sahilbhaiallupdate'><b> Click Here For Setup & Updates</b></a>"
     )
     
+    try:
     await callback_query.message.edit_text(
-    text=update_text,
-    reply_markup=update_kb(),
-    parse_mode="HTML",
-    disable_web_page_preview=False
-)
+        text=update_text,
+        reply_markup=update_kb(),
+        parse_mode="HTML",
+        disable_web_page_preview=False
+    )
+except TelegramBadRequest:
+    pass
 
 
 
