@@ -241,8 +241,8 @@ async def process_check_update(call: types.CallbackQuery):
             parse_mode="HTML",
             disable_web_page_preview=False
     )
-except TelegramBadRequest:
-    pass
+    except TelegramBadRequest:
+        pass
 
 
 
