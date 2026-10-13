@@ -746,10 +746,8 @@ def process_spin(user_id):
             )
 
         conn.commit()
-        conn.close()
         return {"status": "won", "amount": amount}
     else:
-        conn.close()
         timeLeft = cooldown - (current_time - last_spin_time)
         return {"status": "cooldown", "timeLeft": timeLeft}
 
