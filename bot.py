@@ -484,7 +484,7 @@ async def menu_add_balance(call: types.CallbackQuery):
 async def process_how_to_use(call: types.CallbackQuery):
     text = (
         "<blockquote>❗ How to use this bot:</blockquote>\n\n"
-        "• Add balance via  UIP QR System or Binance Pay\n"
+        "• Add balance via  UIP QR System\n"
         "• Tap Buy Now and pick your desired product\n"
         "• Key is delivered instantly to this chat screen\n"
         "• Browse plans and checkout seamlessly"
@@ -748,6 +748,7 @@ def process_spin(user_id):
         conn.commit()
         conn.close()
         return {"status": "won", "amount": amount}
+        conn.close()
     else:
         timeLeft = cooldown - (current_time - last_spin_time)
         return {"status": "cooldown", "timeLeft": timeLeft}
