@@ -129,7 +129,7 @@ def get_balance(user_id: int) -> float:
     return result[0] if result else 0.0
 
 # बोट सेटअप
-API_TOKEN = '8893885804:AAHfcYBcIOx2FOzJqCShavfw9w6wDM7xSek'
+API_TOKEN = '8658449926:AAEBce8bzjgesdgPR4ECZvRWZPCIIGSxCjU'
 logging.basicConfig(level=logging.INFO)
 bot = Bot(token=API_TOKEN)
 dp = Dispatcher()
@@ -327,7 +327,7 @@ from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
 @router.callback_query(F.data == "menu_refer")
 async def refer_and_earn(call: types.CallbackQuery):
     user_id = call.from_user.id
-    bot_username = "TESTBB11BOT"
+    bot_username = "Sahilbhayabot"
     referral_link = f"https://t.me/{bot_username}?start=ref{user_id}"
 
     message_text = (
