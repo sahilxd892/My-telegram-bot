@@ -724,34 +724,27 @@ def process_spin(user_id):
     current_time = int(time.time())
     conn = sqlite3.connect("products.db")
     cursor = conn.cursor()
-
-    cursor.execute(
-        "SELECT last_spin_time FROM daily_spin WHERE user_id = ?", (user_id,)
-    )
+    
+    cursor.execute("SELECT last_spin_time FROM daily_spin WHERE user_id = ?", (user_id,))
     result = cursor.fetchone()
     last_spin_time = result[0] if result else 0
     cooldown = 24 * 3600
 
     if current_time - last_spin_time >= cooldown:
         amount = 0.0
-        cursor.execute(
-            "UPDATE daily_spin SET last_spin_time = ? WHERE user_id = ?",
-            (current_time, user_id),
-        )
-
-        if cursor.rowcount == 0:
-            cursor.execute(
-                "INSERT INTO daily_spin (user_id, last_spin_time) VALUES (?, ?)",
-                (user_id, current_time),
-            )
-
+        if result is None:
+            cursor.execute("INSERT INTO daily_spin (user_id, last_spin_time) VALUES (?, ?)", (user_id, current_time))
+        else:
+            cursor.execute("UPDATE daily_spin SET last_spin_time = ? WHERE user_id = ?", (current_time, user_id))
+        
         conn.commit()
         conn.close()
         return {"status": "won", "amount": amount}
-        conn.close()
     else:
-        timeLeft = cooldown - (current_time - last_spin_time)
-        return {"status": "cooldown", "timeLeft": timeLeft}
+        timeleft = cooldown - (current_time - last_spin_time)
+        conn.close()
+        return {"status": "cooldown", "timeleft": timeleft}
+
 
 
 
