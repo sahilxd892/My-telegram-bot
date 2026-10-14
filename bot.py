@@ -126,6 +126,7 @@ def get_balance(user_id: int) -> float:
     cursor.execute("SELECT balance FROM users WHERE user_id = ?", (user_id,))
     result = cursor.fetchone()
     conn.close()
+    print(f"Current balance for {user_id}: {result[0] if result else 0.0}")
     return result[0] if result else 0.0
 
 # बोट सेटअप
