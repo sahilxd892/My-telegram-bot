@@ -429,7 +429,7 @@ async def process_daily_gift(call: types.CallbackQuery):
         text = (f"<blockquote><b>🎁 Daily Lucky Spin Wheel </b></blockquote>\n\n"
                 f"〰️〰️〰️〰️〰️〰️〰️〰️〰️〰️\n\n"
                 f"Spin the wheel once every 24 hours and win free balance credited instantly to your wallet!\n\n"
-                f"┝ 🪙 Winning Range: ₹0.00 to ₹1.00\n"
+                f"┝ 🪙 Winning Range: ₹0.00 to ₹0.00\n"
                 f"┝ ⏳ Spin Limit: 1 spin per 24 hours\n\n"
                 f"👇 Click the button below to try your luck:")
                 
@@ -733,7 +733,7 @@ def process_spin(user_id):
     cooldown = 24 * 3600
 
     if current_time - last_spin_time >= cooldown:
-        amount = round(random.uniform(0.0, 1.0), 2)
+        amount = 0.0
         cursor.execute(
             "UPDATE daily_spin SET last_spin_time = ? WHERE user_id = ?",
             (current_time, user_id),
@@ -786,7 +786,7 @@ async def spin_now(call: types.CallbackQuery):
     f"<b><blockquote>🎁 Daily Lucky Spin Wheel </blockquote></b>\n\n"
     "〰️〰️〰️〰️〰️〰️〰️〰️〰️〰️\n\n"
     "Spin the wheel once every 24 hours and win free balance credited instantly to your wallet!\n\n"
-    "<b>┝🪙Winning Range:</b> ₹0.00 to ₹1.00\n"
+    "<b>┝🪙Winning Range:</b> ₹0.00 to ₹0.00\n"
     "<b>┝⏳Spin Limit:</b> 1 spin per 24 hours\n\n"
     f"<b><blockquote>⏳You have already claimed today's spin! </blockquote></b>\n"
     f"Please wait another {hours}h {minutes}m before trying to spin the wheel again."
