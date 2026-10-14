@@ -446,7 +446,7 @@ async def process_daily_gift(call: types.CallbackQuery):
         f"<b><blockquote>🎁 Daily Lucky Spin Wheel </blockquote></b>\n\n"
         "〰️〰️〰️〰️〰️〰️〰️〰️〰️〰️\n\n"
         "Spin the wheel once every 24 hours and win free balance credited instantly to your wallet!\n\n"
-        "<b>┝🪙Winning Range:</b> ₹0.00 to ₹1.00\n"
+        "<b>┝🪙Winning Range:</b> ₹0.00 to ₹0.00\n"
         "<b>┝⏳Spin Limit:</b> 1 spin per 24 hours\n\n"
         f"<b><blockquote>⏳You have already claimed today's spin! </blockquote></b>\n"
         f"Please wait another {hours}h {minutes}m before trying to spin the wheel again."
