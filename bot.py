@@ -114,7 +114,7 @@ def update_balance(user_id: int, amount: float):
             (user_id, amount, amount),
         )
 
-
+    print(f"Updating balance for {user_id} with amount: {amount}")
 
 
 
