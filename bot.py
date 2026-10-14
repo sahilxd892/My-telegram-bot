@@ -114,7 +114,7 @@ def update_balance(user_id: int, amount: float):
             (user_id, amount, amount),
         )
 
-    print(f"Updating balance for {user_id} with amount: {amount}")
+    
 
 
 
@@ -126,7 +126,6 @@ def get_balance(user_id: int) -> float:
     cursor.execute("SELECT balance FROM users WHERE user_id = ?", (user_id,))
     result = cursor.fetchone()
     conn.close()
-    print(f"Current balance for {user_id}: {result[0] if result else 0.0}")
     return result[0] if result else 0.0
 
 # बोट सेटअप
@@ -767,6 +766,7 @@ async def spin_now(call: types.CallbackQuery):
         amount = status_result["amount"]
         update_balance(user_id, amount)
         current_balance = get_balance(user_id)
+        print(f"Spin won for {user_id}: Amount = {amount}")
         new_balance = current_balance
 
         
