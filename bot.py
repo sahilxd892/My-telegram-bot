@@ -1,3 +1,4 @@
+import os
 import sqlite3
 import logging
 from datetime import datetime, timedelta
@@ -129,7 +130,7 @@ def get_balance(user_id: int) -> float:
     return result[0] if result else 0.0
 
 # बोट सेटअप
-API_TOKEN = '7921028180:AAHpPGsCl1Phplsk6PvXu01_4P8-8vFEUSw'
+API_TOKEN = os.getenv("API_TOKEN")
 logging.basicConfig(level=logging.INFO)
 bot = Bot(token=API_TOKEN)
 dp = Dispatcher()
