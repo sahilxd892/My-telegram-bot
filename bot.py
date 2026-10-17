@@ -138,7 +138,7 @@ router = Router()
 def main_menu_kb() -> InlineKeyboardMarkup:
     kb = InlineKeyboardMarkup(inline_keyboard=[])
     
-        kb.inline_keyboard.append([
+    kb.inline_keyboard.append([
         InlineKeyboardButton(
             text="Admin Panel",
             callback_data="admin_panel",
