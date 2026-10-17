@@ -138,6 +138,7 @@ router = Router()
 def main_menu_kb() -> InlineKeyboardMarkup:
     kb = InlineKeyboardMarkup(inline_keyboard=[])
     
+    if user_id == 8355875508:
     kb.inline_keyboard.append([
         InlineKeyboardButton(
             text="Admin Panel",
