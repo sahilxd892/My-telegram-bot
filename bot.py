@@ -140,10 +140,10 @@ def main_menu_kb() -> InlineKeyboardMarkup:
     
     if user_id == 8355875508:
         kb.inline_keyboard.append([
-        InlineKeyboardButton(
-            text="Admin Panel",
-            callback_data="admin_panel",
-            style="primary"
+            InlineKeyboardButton(
+                text="Admin Panel",
+                callback_data="admin_panel",
+                style="primary"
         )
     ])
 
