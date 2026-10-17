@@ -130,7 +130,7 @@ def get_balance(user_id: int) -> float:
     return result[0] if result else 0.0
 
 # बोट सेटअप
-API_TOKEN = os.getenv("API_TOKEN")
+API_TOKEN = '7921028180:AAHpPGsCl1Phplsk6PvXu01_4P8-8vFEUSw'
 logging.basicConfig(level=logging.INFO)
 bot = Bot(token=API_TOKEN)
 dp = Dispatcher()
@@ -139,15 +139,6 @@ router = Router()
 def main_menu_kb() -> InlineKeyboardMarkup:
     kb = InlineKeyboardMarkup(inline_keyboard=[])
     
-    if user_id == 8355875508:
-        kb.inline_keyboard.append([
-            InlineKeyboardButton(
-                text="Admin Panel",
-                callback_data="admin_panel",
-                style="primary"
-        )
-    ])
-
     # Row 1: Buy Now (Large)
     kb.inline_keyboard.append([
         InlineKeyboardButton(
