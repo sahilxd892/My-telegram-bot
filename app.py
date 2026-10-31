@@ -5,8 +5,8 @@
 Standalone FamPay UPI Payment & Gmail IMAP Verification API (Python 3.8+)
 ============================================================================
 Buyer ID     : rby_f8580aed95aa971c
-Merchant     : Cracker
-Issued By    : Cracker
+Merchant     : Sahil Bhai Store
+Issued By    : Sahil Bhai
 Generated At : 2026-10-31T15:43:12Z
 
 Zero External Dependencies Required (uses Python standard library `imaplib`,
@@ -46,11 +46,11 @@ _DEFAULT_DIR = os.path.dirname(os.path.abspath(__file__))
 _STORAGE_DIR = _DEFAULT_DIR if os.access(_DEFAULT_DIR, os.W_OK) else "/tmp"
 
 CONFIG = {
-    "fampay_upi": os.environ.get("FAMPAY_UPI_ID", "36445554@fam"),
-    "gmail_email": os.environ.get("GMAIL_EMAIL", "cracker63554@gmail.com"),
-    "gmail_app_password": re.sub(r"\s+", "", os.environ.get("GMAIL_APP_PASSWORD", "xqWK898xVKYbGGJ")),
-    "merchant_name": os.environ.get("MERCHANT_NAME", "Cracker"),
-    "api_brand": os.environ.get("API_BRAND", "Cracker"),
+    "fampay_upi": os.environ.get("FAMPAY_UPI_ID", "sahilsk892@fam"),
+    "gmail_email": os.environ.get("GMAIL_EMAIL", "sahilxd892@gmail.com"),
+    "gmail_app_password": re.sub(r"\s+", "", os.environ.get("GMAIL_APP_PASSWORD", "hgimjdjpspvodquk")),
+    "merchant_name": os.environ.get("MERCHANT_NAME", "Sahil Bhai Store"),
+    "api_brand": os.environ.get("API_BRAND", "Sahil Bhai"),
     "api_key": os.environ.get("FAMPAY_API_KEY", "fp_live_e42c7df07625afea05bae870411c7f67"),
     "webhook_url": os.environ.get("WEBHOOK_URL", ""),
     "webhook_secret": os.environ.get("WEBHOOK_SECRET", "whsec_26eba733e0dce307a99772b05f4726c9"),
