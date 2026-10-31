@@ -37,7 +37,6 @@ from email.utils import parsedate_to_datetime
 from datetime import datetime, timezone
 from urllib.parse import urlencode, quote, urlparse, parse_qs
 from urllib.request import Request, urlopen
-from http.server import HTTPServer, BaseHTTPRequestHandler
 
 # ============================================================================
 # 1. STANDALONE BUYER FAMPAY CONFIGURATION
@@ -570,9 +569,6 @@ class handler(BaseHTTPRequestHandler):
         }, 201)
 
 
-FamPayAPIHandler = handler
+app = Flask(_name_)
 
 if __name__ == "__main__":
-    server = HTTPServer(("0.0.0.0", CONFIG["port"]), handler)
-    print(f"[FamPay Standalone Python API] Listening on http://0.0.0.0:{CONFIG['port']} (UPI: {CONFIG['fampay_upi']})")
-    server.serve_forever()
