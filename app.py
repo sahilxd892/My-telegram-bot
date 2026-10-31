@@ -570,5 +570,7 @@ class handler(BaseHTTPRequestHandler):
 
 
 app = Flask(_name_)
-
+def handler(request):
+    return app(request.environ, lambda *args, **kwargs: None)
+        
 if __name__ == "__main__":
