@@ -1,5 +1,5 @@
 import sqlite3
-from flask import Flask, render_template, request, session, redirect, url_for, flash
+from flask import Flask, render_template, render_template_string, request, session, redirect, url_for, flash
 from flask_mail import Mail, Message
 from werkzeug.security import generate_password_hash, check_password_hash
 import random
