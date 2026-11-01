@@ -27,18 +27,14 @@ LOGIN_HTML = '''
             background: #0f3460; padding: 40px; border-radius: 20px;
             width: 320px; text-align: center;
         }
-        .glow-card::before, .glow-card::after {
+        .glow-card::before {
             content: '';
             position: absolute;
             inset: -3px;
             border-radius: 23px;
-            background: conic-gradient(from var(--angle), #00d2ff, #3b82f6, #00d2ff);
+            background: conic-gradient(from var(--angle), #00d2ff, #2563eb, #00d2ff);
             animation: rotate 4s linear infinite;
             z-index: -1;
-        }
-        .glow-card::after {
-            filter: blur(15px);
-            opacity: 0.8;
         }
         h2 { color: #fff; margin-bottom: 25px; font-weight: bold; letter-spacing: 1px; }
         .input-group {
@@ -46,17 +42,17 @@ LOGIN_HTML = '''
         }
         input {
             width: 100%; padding: 14px 15px; background: #16213e;
-            border: none; border-radius: 10px; color: white;
+            border: 1px solid #2563eb; border-radius: 10px; color: white;
             box-sizing: border-box; font-size: 16px; outline: none;
-            text-transform: uppercase;
         }
         input::placeholder {
             color: #888;
+            text-transform: uppercase;
         }
         button {
-            width: 100%; background: linear-gradient(to right, #00d2ff, #3b82f6); color: white;
+            width: 100%; background: linear-gradient(to right, #00d2ff, #2563eb); color: white;
             padding: 14px; border: none; border-radius: 10px; cursor: pointer;
-            font-size: 18px; font-weight: bold; margin-top: 10px; box-shadow: 0 4px 15px rgba(0,210,255,0.4);
+            font-size: 18px; font-weight: bold; margin-top: 10px;
             text-transform: uppercase;
         }
         .links { margin-top: 20px; font-size: 14px; display: flex; justify-content: space-between; }
@@ -112,18 +108,14 @@ REGISTER_HTML = '''
             background: #0f3460; padding: 40px; border-radius: 20px;
             width: 320px; text-align: center;
         }
-        .glow-card::before, .glow-card::after {
+        .glow-card::before {
             content: '';
             position: absolute;
             inset: -3px;
             border-radius: 23px;
-            background: conic-gradient(from var(--angle), #00d2ff, #3b82f6, #00d2ff);
+            background: conic-gradient(from var(--angle), #00d2ff, #2563eb, #00d2ff);
             animation: rotate 4s linear infinite;
             z-index: -1;
-        }
-        .glow-card::after {
-            filter: blur(15px);
-            opacity: 0.8;
         }
         h2 { color: #fff; margin-bottom: 25px; font-weight: bold; letter-spacing: 1px; }
         .input-group {
@@ -131,17 +123,17 @@ REGISTER_HTML = '''
         }
         input {
             width: 100%; padding: 14px 15px; background: #16213e;
-            border: none; border-radius: 10px; color: white;
+            border: 1px solid #2563eb; border-radius: 10px; color: white;
             box-sizing: border-box; font-size: 16px; outline: none;
-            text-transform: uppercase;
         }
         input::placeholder {
             color: #888;
+            text-transform: uppercase;
         }
         button {
-            width: 100%; background: linear-gradient(to right, #00d2ff, #3b82f6); color: white;
+            width: 100%; background: linear-gradient(to right, #00d2ff, #2563eb); color: white;
             padding: 14px; border: none; border-radius: 10px; cursor: pointer;
-            font-size: 18px; font-weight: bold; margin-top: 10px; box-shadow: 0 4px 15px rgba(0,210,255,0.4);
+            font-size: 18px; font-weight: bold; margin-top: 10px;
             text-transform: uppercase;
         }
         .links { margin-top: 20px; font-size: 14px; }
