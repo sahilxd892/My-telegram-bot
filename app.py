@@ -123,31 +123,30 @@ STYLE_CSS = '''
 </style>
 '''
 
-BASE_TEMPLATE = '''
+def wrap_layout(title, content_html):
+    return f'''
 <!DOCTYPE html>
 <html>
 <head>
-  <title>My Gateway</title>
-  ''' + STYLE_CSS + '''
+  <title>{{{{ title }}}}</title>
+  {STYLE_CSS}
 </head>
 <body>
   <div class="auth-card">
-    {% with messages = get_flashed_messages(with_categories=true) %}
-      {% if messages %}
-        {% for category, message in messages %}
-          <div class="flash-msg flash-{{ category }}">{{ message }}</div>
-        {% endfor %}
-      {% endif %}
-    {% endwith %}
-    {% block content %}{% endblock %}
+    {{% with messages = get_flashed_messages(with_categories=true) %}}
+      {{% if messages %}}
+        {{% for category, message in messages %}}
+          <div class="flash-msg flash-{{{{ category }}}}">{{{{ message }}}}</div>
+        {{% endfor %}}
+      {{% endif %}}
+    {{% endwith %}}
+    {content_html}
   </div>
 </body>
 </html>
 '''
 
-REGISTER_TEMPLATE = '''
-{% extends "base.html" %}
-{% block content %}
+REGISTER_TEMPLATE = wrap_layout("Register", '''
 <h2>Register</h2>
 <form method="POST">
   <div class="input-group">
@@ -169,14 +168,11 @@ REGISTER_TEMPLATE = '''
   <button type="submit">REGISTER</button>
 </form>
 <div class="footer-links">
-  <p>Already have an account? <a href="{{ url_for('login') }}">Login</a></p>
+  <p>Already have an account? <a href="{{{{ url_for('login') }}}}">Login</a></p>
 </div>
-{% endblock %}
-'''
+''')
 
-LOGIN_TEMPLATE = '''
-{% extends "base.html" %}
-{% block content %}
+LOGIN_TEMPLATE = wrap_layout("Login", '''
 <h2>Login</h2>
 <form method="POST">
   <div class="input-group">
@@ -190,15 +186,12 @@ LOGIN_TEMPLATE = '''
   <button type="submit">LOGIN</button>
 </form>
 <div class="footer-links">
-  <p><a href="{{ url_for('forgot_password') }}">Forgot Password?</a></p>
-  <p>Don't have an account? <a href="{{ url_for('register') }}">Sign Up</a></p>
+  <p><a href="{{{{ url_for('forgot_password') }}}}">Forgot Password?</a></p>
+  <p>Don't have an account? <a href="{{{{ url_for('register') }}}}">Sign Up</a></p>
 </div>
-{% endblock %}
-'''
+''')
 
-FORGOT_PASSWORD_TEMPLATE = '''
-{% extends "base.html" %}
-{% block content %}
+FORGOT_PASSWORD_TEMPLATE = wrap_layout("Forgot Password", '''
 <h2>Forgot Password</h2>
 <form method="POST">
   <div class="input-group">
@@ -208,10 +201,9 @@ FORGOT_PASSWORD_TEMPLATE = '''
   <button type="submit">SEND OTP</button>
 </form>
 <div class="footer-links">
-  <p><a href="{{ url_for('login') }}">Back to Login</a></p>
+  <p><a href="{{{{ url_for('login') }}}}">Back to Login</a></p>
 </div>
-{% endblock %}
-'''
+''')
 
 # Helper to render templates from strings
 def render_custom_template(template_str, **context):
