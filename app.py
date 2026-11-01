@@ -32,7 +32,7 @@ LOGIN_HTML = '''
             position: absolute;
             inset: -3px;
             border-radius: 23px;
-            background: conic-gradient(from var(--angle), #ff4757, #2ed573, #1e90ff, #fffb00, #ff4757);
+            background: conic-gradient(from var(--angle), #00d2ff, #3b82f6, #00d2ff);
             animation: rotate 4s linear infinite;
             z-index: -1;
         }
@@ -54,13 +54,13 @@ LOGIN_HTML = '''
             color: #888;
         }
         button {
-            width: 100%; background: linear-gradient(to right, #ff4757, #ff6b81); color: white;
+            width: 100%; background: linear-gradient(to right, #00d2ff, #3b82f6); color: white;
             padding: 14px; border: none; border-radius: 10px; cursor: pointer;
-            font-size: 18px; font-weight: bold; margin-top: 10px; box-shadow: 0 4px 15px rgba(255,71,87,0.4);
+            font-size: 18px; font-weight: bold; margin-top: 10px; box-shadow: 0 4px 15px rgba(0,210,255,0.4);
             text-transform: uppercase;
         }
         .links { margin-top: 20px; font-size: 14px; display: flex; justify-content: space-between; }
-        .links a { color: #4ecca3; text-decoration: none; text-transform: uppercase; }
+        .links a { color: #00d2ff; text-decoration: none; text-transform: uppercase; }
         .links a:hover { text-decoration: underline; }
     </style>
 </head>
@@ -117,7 +117,7 @@ REGISTER_HTML = '''
             position: absolute;
             inset: -3px;
             border-radius: 23px;
-            background: conic-gradient(from var(--angle), #ff4757, #2ed573, #1e90ff, #fffb00, #ff4757);
+            background: conic-gradient(from var(--angle), #00d2ff, #3b82f6, #00d2ff);
             animation: rotate 4s linear infinite;
             z-index: -1;
         }
@@ -139,13 +139,13 @@ REGISTER_HTML = '''
             color: #888;
         }
         button {
-            width: 100%; background: linear-gradient(to right, #2ed573, #26af5a); color: white;
+            width: 100%; background: linear-gradient(to right, #00d2ff, #3b82f6); color: white;
             padding: 14px; border: none; border-radius: 10px; cursor: pointer;
-            font-size: 18px; font-weight: bold; margin-top: 10px; box-shadow: 0 4px 15px rgba(46,213,115,0.4);
+            font-size: 18px; font-weight: bold; margin-top: 10px; box-shadow: 0 4px 15px rgba(0,210,255,0.4);
             text-transform: uppercase;
         }
         .links { margin-top: 20px; font-size: 14px; }
-        .links a { color: #4ecca3; text-decoration: none; text-transform: uppercase; }
+        .links a { color: #00d2ff; text-decoration: none; text-transform: uppercase; }
         .links a:hover { text-decoration: underline; }
     </style>
 </head>
