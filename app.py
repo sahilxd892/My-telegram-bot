@@ -8,49 +8,93 @@ LOGIN_HTML = '''
 <head>
     <title>Login</title>
     <style>
+        @property {
+            syntax: '<angle>';
+            inherits: false;
+            initial-value: 0deg;
+        }
+        @keyframes rotate {
+            0% { --angle: 0deg; }
+            100% { --angle: 360deg; }
+        }
         body {
             margin: 0; padding: 0; display: flex; justify-content: center; align-items: center; height: 100vh;
-            background: linear-gradient(135deg, #a1c4fd 0%, #c2e9fb 100%);
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
-        .card {
-            background: white; padding: 30px; border-radius: 15px; box-shadow: 0 10px 25px rgba(0,0,0,0.1);
-            width: 300px; text-align: center;
+        .glow-card {
+            position: relative;
+            background: #0f3460; padding: 40px; border-radius: 20px;
+            width: 320px; text-align: center;
         }
-        h2 { color: #333; margin-bottom: 20px; font-weight: bold; }
+        .glow-card::before, .glow-card::after {
+            content: '';
+            position: absolute;
+            inset: -3px;
+            border-radius: 23px;
+            background: conic-gradient(from var(--angle), #ff4757, #2ed573, #1e90ff, #fffb00, #ff4757);
+            animation: rotate 4s linear infinite;
+            z-index: -1;
+        }
+        .glow-card::after {
+            filter: blur(15px);
+            opacity: 0.8;
+        }
+        h2 { color: #fff; margin-bottom: 25px; font-weight: bold; letter-spacing: 1px; }
+        .input-group {
+            position: relative; margin-bottom: 20px;
+        }
         input {
-            width: 100%; padding: 12px; margin: 10px 0; border: 1px solid #ccc; border-radius: 8px;
-            box-sizing: border-box; font-size: 16px;
+            width: 100%; padding: 14px 40px 14px 15px; background: #16213e;
+            border: 1px solid #533483; border-radius: 10px; color: white;
+            box-sizing: border-box; font-size: 16px; outline: none;
+        }
+        input:focus { border-color: #2ed573; }
+        .toggle-password {
+            position: absolute; right: 12px; top: 50%; transform: translateY(-50%);
+            background: none; border: none; color: #888; cursor: pointer; font-size: 16px;
         }
         button {
-            width: 100%; background-color: #ff4757; color: white; padding: 12px; border: none;
-            border-radius: 8px; cursor: pointer; font-size: 18px; margin-top: 15px;
+            width: 100%; background: linear-gradient(to right, #ff4757, #ff6b81); color: white;
+            padding: 14px; border: none; border-radius: 10px; cursor: pointer;
+            font-size: 18px; font-weight: bold; margin-top: 10px; box-shadow: 0 4px 15px rgba(255,71,87,0.4);
         }
-        button:hover { background-color: #ff6b81; }
-        .forgot-link {
-            text-align: right; margin-bottom: 15px; font-size: 14px;
-        }
-        .forgot-link a { color: #57606f; text-decoration: none; }
-        .forgot-link a:hover { text-decoration: underline; }
-        .create-account { margin-top: 15px; font-size: 14px; }
-        .create-account a { color: #ff4757; text-decoration: none; font-weight: bold; }
+        .links { margin-top: 20px; font-size: 14px; display: flex; justify-content: space-between; }
+        .links a { color: #4ecca3; text-decoration: none; }
+        .links a:hover { text-decoration: underline; }
     </style>
 </head>
 <body>
-    <div class="card">
+    <div class="glow-card">
         <h2>LOGIN</h2>
         <form method="POST">
-            <input type="text" name="email" placeholder="EMAIL ADDRESS" required>
-            <input type="password" name="password" placeholder="PASSWORD" required>
-            <div class="forgot-link">
+            <div class="input-group">
+                <input type="text" name="email" placeholder="Email Address" required>
+            </div>
+            <div class="input-group">
+                <input type="password" name="password" id="login-pass" placeholder="Password" required>
+                <button type="button" class="toggle-password" onclick="togglePass('login-pass')">👁️</button>
+            </div>
+            <div class="links" style="justify-content: flex-end;">
                 <a href="#">Forgot password?</a>
             </div>
             <button type="submit">Login</button>
         </form>
-        <div class="create-account">
-            <a href="/register">Create account</a>
+        <div class="links">
+            <span>Don't have an account? <a href="/register">Sign up</a></span>
         </div>
     </div>
+
+    <script>
+        function togglePass(id) {
+            const input = document.getElementById(id);
+            if (input.type === "password") {
+                input.type = "text";
+            } else {
+                input.type = "password";
+            }
+        }
+    </script>
 </body>
 </html>
 '''
@@ -61,44 +105,97 @@ REGISTER_HTML = '''
 <head>
     <title>Register</title>
     <style>
+        @property {
+            syntax: '<angle>';
+            inherits: false;
+            initial-value: 0deg;
+        }
+        @keyframes rotate {
+            0% { --angle: 0deg; }
+            100% { --angle: 360deg; }
+        }
         body {
             margin: 0; padding: 0; display: flex; justify-content: center; align-items: center; height: 100vh;
-            background: linear-gradient(135deg, #fbc2eb 0%, #a6c1ee 100%);
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
-        .card {
-            background: white; padding: 30px; border-radius: 15px; box-shadow: 0 10px 25px rgba(0,0,0,0.1);
-            width: 300px; text-align: center;
+        .glow-card {
+            position: relative;
+            background: #0f3460; padding: 40px; border-radius: 20px;
+            width: 320px; text-align: center;
         }
-        h2 { color: #333; margin-bottom: 20px; font-weight: bold; }
+        .glow-card::before, .glow-card::after {
+            content: '';
+            position: absolute;
+            inset: -3px;
+            border-radius: 23px;
+            background: conic-gradient(from var(--angle), #ff4757, #2ed573, #1e90ff, #fffb00, #ff4757);
+            animation: rotate 4s linear infinite;
+            z-index: -1;
+        }
+        .glow-card::after {
+            filter: blur(15px);
+            opacity: 0.8;
+        }
+        h2 { color: #fff; margin-bottom: 25px; font-weight: bold; letter-spacing: 1px; }
+        .input-group {
+            position: relative; margin-bottom: 20px;
+        }
         input {
-            width: 100%; padding: 12px; margin: 10px 0; border: 1px solid #ccc; border-radius: 8px;
-            box-sizing: border-box; font-size: 16px;
+            width: 100%; padding: 14px 40px 14px 15px; background: #16213e;
+            border: 1px solid #533483; border-radius: 10px; color: white;
+            box-sizing: border-box; font-size: 16px; outline: none;
         }
-        .uppercase-input { text-transform: uppercase; }
+        input:focus { border-color: #2ed573; }
+        .toggle-password {
+            position: absolute; right: 12px; top: 50%; transform: translateY(-50%);
+            background: none; border: none; color: #888; cursor: pointer; font-size: 16px;
+        }
         button {
-            width: 100%; background-color: #2ed573; color: white; padding: 12px; border: none;
-            border-radius: 8px; cursor: pointer; font-size: 18px; margin-top: 10px;
+            width: 100%; background: linear-gradient(to right, #2ed573, #26af5a); color: white;
+            padding: 14px; border: none; border-radius: 10px; cursor: pointer;
+            font-size: 18px; font-weight: bold; margin-top: 10px; box-shadow: 0 4px 15px rgba(46,213,115,0.4);
         }
-        button:hover { background-color: #7bed9f; }
-        .links { margin-top: 15px; font-size: 14px; }
-        .links a { color: #57606f; text-decoration: none; }
+        .links { margin-top: 20px; font-size: 14px; }
+        .links a { color: #4ecca3; text-decoration: none; }
+        .links a:hover { text-decoration: underline; }
     </style>
 </head>
 <body>
-    <div class="card">
+    <div class="glow-card">
         <h2>REGISTER</h2>
         <form method="POST">
-            <input type="text" class="uppercase-input" name="username" placeholder="USERNAME" required>
-            <input type="text" name="email" placeholder="EMAIL ADDRESS" required>
-            <input type="password" name="password" placeholder="PASSWORD" required>
-            <input type="password" name="confirm_password" placeholder="Confirm Password" required>
+            <div class="input-group">
+                <input type="text" name="username" placeholder="Username" required>
+            </div>
+            <div class="input-group">
+                <input type="text" name="email" placeholder="Email Address" required>
+            </div>
+            <div class="input-group">
+                <input type="password" name="password" id="reg-pass" placeholder="Password" required>
+                <button type="button" class="toggle-password" onclick="togglePass('reg-pass')">👁️</button>
+            </div>
+            <div class="input-group">
+                <input type="password" name="confirm_password" id="conf-pass" placeholder="Confirm Password" required>
+                <button type="button" class="toggle-password" onclick="togglePass('conf-pass')">👁️</button>
+            </div>
             <button type="submit">Register</button>
         </form>
         <div class="links">
             <a href="/">Back to Login</a>
         </div>
     </div>
+
+    <script>
+        function togglePass(id) {
+            const input = document.getElementById(id);
+            if (input.type === "password") {
+                input.type = "text";
+            } else {
+                input.type = "password";
+            }
+        }
+    </script>
 </body>
 </html>
 '''
