@@ -22,7 +22,6 @@ LOGIN_HTML = '''
             width: 100%; padding: 12px; margin: 10px 0; border: 1px solid #ccc; border-radius: 8px;
             box-sizing: border-box; font-size: 16px;
         }
-        .uppercase-input { text-transform: uppercase; }
         button {
             width: 100%; background-color: #ff4757; color: white; padding: 12px; border: none;
             border-radius: 8px; cursor: pointer; font-size: 18px; margin-top: 15px;
@@ -41,8 +40,8 @@ LOGIN_HTML = '''
     <div class="card">
         <h2>LOGIN</h2>
         <form method="POST">
-            <input type="text" class="uppercase-input" name="email" placeholder="EMAIL ADDRESS" required>
-            <input type="text" class="uppercase-input" name="password" placeholder="PASSWORD" required>
+            <input type="text" name="email" placeholder="EMAIL ADDRESS" required>
+            <input type="password" name="password" placeholder="PASSWORD" required>
             <div class="forgot-link">
                 <a href="#">Forgot password?</a>
             </div>
@@ -91,8 +90,8 @@ REGISTER_HTML = '''
         <h2>REGISTER</h2>
         <form method="POST">
             <input type="text" class="uppercase-input" name="username" placeholder="USERNAME" required>
-            <input type="text" class="uppercase-input" name="email" placeholder="EMAIL ADDRESS" required>
-            <input type="password" name="password" placeholder="Password" required>
+            <input type="text" name="email" placeholder="EMAIL ADDRESS" required>
+            <input type="password" name="password" placeholder="PASSWORD" required>
             <input type="password" name="confirm_password" placeholder="Confirm Password" required>
             <button type="submit">Register</button>
         </form>
