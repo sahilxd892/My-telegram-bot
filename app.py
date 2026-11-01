@@ -2,7 +2,7 @@ from flask import Flask, render_template_string, request
 
 app = Flask(__name__)
 
-# UPDATED CSS AND HTML TEMPLATES WITH HIGHLY VISIBLE BORDER AND CAPITALIZED TEXT
+# CSS AND HTML TEMPLATES WITH FIXED CARD WIDTH AND PROPER LINK PLACEMENT
 
 BASE_STYLE = '''
 <style>
@@ -17,20 +17,23 @@ BASE_STYLE = '''
     }
     body {
         margin: 0;
-        padding: 0;
+        padding: 20px;
         display: flex;
         justify-content: center;
         align-items: center;
-        height: 100vh;
+        min-height: 100vh;
         background: linear-gradient(135deg, #0a0a16 0%, #1a1a2e 100%);
         font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        box-sizing: border-box;
     }
     .glow-card {
         position: relative;
         background: #0f3460;
-        padding: 40px;
+        padding: 40px 30px;
         border-radius: 20px;
-        width: 320px;
+        width: 100%;
+        max-width: 400px; /* Perfectly proportioned for mobile and desktop */
+        margin: 20px auto;
         text-align: center;
         box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
     }
@@ -40,7 +43,7 @@ BASE_STYLE = '''
         inset: -6px;
         border-radius: 24px;
         background: conic-gradient(from var(--angle), #00d2ff, #0052ff, #00d2ff, #00f2fe, #00d2ff);
-        animation: rotate 8s linear infinite; /* Slower rotation */
+        animation: rotate 10s linear infinite;
         z-index: -1;
     }
     h2 {
@@ -49,6 +52,7 @@ BASE_STYLE = '''
         font-weight: bold;
         letter-spacing: 2px;
         text-transform: uppercase;
+        font-size: 24px;
     }
     .input-group {
         margin-bottom: 25px;
@@ -58,22 +62,22 @@ BASE_STYLE = '''
         width: 100%;
         padding: 15px;
         background: #16213e;
-        border: 2px solid transparent; /* Invisible border when empty */
+        border: 2px solid transparent;
         border-radius: 12px;
         color: white;
         box-sizing: border-box;
         font-size: 16px;
         outline: none;
         transition: border-color 0.3s ease, box-shadow 0.3s ease;
-        text-transform: uppercase; /* Typed text strictly uppercase */
+        text-transform: uppercase;
     }
     input::placeholder {
-        color: #666; /* Visible placeholder */
-        text-transform: uppercase; /* Placeholder strictly uppercase */
+        color: #888;
+        text-transform: uppercase;
         opacity: 1;
     }
     input:focus {
-        border-color: #00d2ff; /* Bright blue border on click */
+        border-color: #00d2ff;
         box-shadow: 0 0 15px rgba(0, 210, 255, 0.6);
     }
     button {
@@ -94,20 +98,24 @@ BASE_STYLE = '''
     button:active {
         transform: scale(0.98);
     }
-    .links {
-        margin-top: 25px;
+    .link-container {
+        margin-top: 20px;
         font-size: 14px;
-        display: flex;
-        justify-content: space-between;
     }
-    .links a {
+    .link-container a {
         color: #00d2ff;
         text-decoration: none;
         text-transform: uppercase;
         font-weight: 500;
+        display: block;
     }
-    .links a:hover {
+    .link-container a:hover {
         text-decoration: underline;
+    }
+    .footer-link {
+        margin-top: 25px;
+        display: flex;
+        justify-content: space-between;
     }
 </style>
 '''
@@ -117,7 +125,7 @@ LOGIN_HTML = f'''
 <html>
 <head>
     <title>LOGIN</title>
-    {BASE_STYLE}
+    {{BASE_STYLE}}
 </head>
 <body>
     <div class="glow-card">
@@ -129,13 +137,13 @@ LOGIN_HTML = f'''
             <div class="input-group">
                 <input type="password" name="password" placeholder="PASSWORD" required>
             </div>
-            <div class="links" style="justify-content: flex-end;">
-                <a href="#">FORGOT PASSWORD?</a>
+            <div class="footer-link" style="justify-content: flex-end;">
+                <a href="#" style="color: #00d2ff; text-decoration: none; text-transform: uppercase; font-size: 14px;">FORGOT PASSWORD?</a>
             </div>
             <button type="submit">LOGIN</button>
         </form>
-        <div class="links">
-            <span>DON'T HAVE AN ACCOUNT? <a href="/register">SIGN UP</a></span>
+        <div class="footer-link">
+            <span>DON'T HAVE AN ACCOUNT? <a href="/register" style="color: #00d2ff; text-decoration: none; text-transform: uppercase;">SIGN UP</a></span>
         </div>
     </div>
 </body>
@@ -147,7 +155,7 @@ REGISTER_HTML = f'''
 <html>
 <head>
     <title>REGISTER</title>
-    {BASE_STYLE}
+    {{BASE_STYLE}}
 </head>
 <body>
     <div class="glow-card">
@@ -166,10 +174,11 @@ REGISTER_HTML = f'''
                 <input type="password" name="confirm_password" placeholder="CONFIRM PASSWORD" required>
             </div>
             <button type="submit">REGISTER</button>
+            <!-- Back to Login placed directly below the Register button -->
+            <div class="link-container">
+                <a href="/">BACK TO LOGIN</a>
+            </div>
         </form>
-        <div class="links">
-            <a href="/">BACK TO LOGIN</a>
-        </div>
     </div>
 </body>
 </html>
