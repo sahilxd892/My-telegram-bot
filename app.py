@@ -1,4 +1,4 @@
-from flask import Flask, render_template_string, request, redirect, url_for
+from flask import Flask, render_template_string, request
 
 app = Flask(__name__)
 
@@ -17,34 +17,38 @@ LOGIN_HTML = '''
             background: white; padding: 30px; border-radius: 15px; box-shadow: 0 10px 25px rgba(0,0,0,0.1);
             width: 300px; text-align: center;
         }
-        h2 { color: #333; margin-bottom: 20px; text-transform: uppercase; }
+        h2 { color: #333; margin-bottom: 20px; font-weight: bold; }
         input {
             width: 100%; padding: 12px; margin: 10px 0; border: 1px solid #ccc; border-radius: 8px;
             box-sizing: border-box; font-size: 16px;
         }
+        .uppercase-input { text-transform: uppercase; }
         button {
             width: 100%; background-color: #ff4757; color: white; padding: 12px; border: none;
-            border-radius: 8px; cursor: pointer; font-size: 18px; margin-top: 10px;
+            border-radius: 8px; cursor: pointer; font-size: 18px; margin-top: 15px;
         }
         button:hover { background-color: #ff6b81; }
-        .links { margin-top: 15px; font-size: 14px; }
-        .links a { color: #57606f; text-decoration: none; margin: 0 5px; }
-        .links a:hover { text-decoration: underline; }
+        .forgot-link {
+            text-align: right; margin-bottom: 15px; font-size: 14px;
+        }
+        .forgot-link a { color: #57606f; text-decoration: none; }
+        .forgot-link a:hover { text-decoration: underline; }
+        .create-account { margin-top: 15px; font-size: 14px; }
+        .create-account a { color: #ff4757; text-decoration: none; font-weight: bold; }
     </style>
 </head>
 <body>
     <div class="card">
         <h2>LOGIN</h2>
-        <div class="links" style="margin-top: 0; margin-bottom: 15px;">
-            <a href="#">Forgot password?</a>
-        </div>
         <form method="POST">
-            <input type="text" name="username" placeholder="Username" required>
-            <input type="email" name="email" placeholder="Email Address" required>
-            <input type="password" name="password" placeholder="Password" required>
+            <input type="text" class="uppercase-input" name="email" placeholder="EMAIL ADDRESS" required>
+            <input type="text" class="uppercase-input" name="password" placeholder="PASSWORD" required>
+            <div class="forgot-link">
+                <a href="#">Forgot password?</a>
+            </div>
             <button type="submit">Login</button>
         </form>
-        <div class="links">
+        <div class="create-account">
             <a href="/register">Create account</a>
         </div>
     </div>
@@ -67,7 +71,7 @@ REGISTER_HTML = '''
             background: white; padding: 30px; border-radius: 15px; box-shadow: 0 10px 25px rgba(0,0,0,0.1);
             width: 300px; text-align: center;
         }
-        h2 { color: #333; margin-bottom: 20px; text-transform: uppercase; }
+        h2 { color: #333; margin-bottom: 20px; font-weight: bold; }
         input {
             width: 100%; padding: 12px; margin: 10px 0; border: 1px solid #ccc; border-radius: 8px;
             box-sizing: border-box; font-size: 16px;
@@ -87,7 +91,7 @@ REGISTER_HTML = '''
         <h2>REGISTER</h2>
         <form method="POST">
             <input type="text" class="uppercase-input" name="username" placeholder="USERNAME" required>
-            <input type="email" name="email" placeholder="Email Address" required>
+            <input type="text" class="uppercase-input" name="email" placeholder="EMAIL ADDRESS" required>
             <input type="password" name="password" placeholder="Password" required>
             <input type="password" name="confirm_password" placeholder="Confirm Password" required>
             <button type="submit">Register</button>
@@ -103,8 +107,8 @@ REGISTER_HTML = '''
 @app.route('/', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
-        user = request.form['username']
-        return f'Welcome back, {user}!'
+        email = request.form['email']
+        return f'Welcome back, user with email {email}!'
     return render_template_string(LOGIN_HTML)
 
 @app.route('/register', methods=['GET', 'POST'])
