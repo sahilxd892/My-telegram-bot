@@ -408,25 +408,7 @@ class handler(BaseHTTPRequestHandler):
         self.end_headers()
 
     def do_GET(self):
-    ifself.path ==
-            '/':
-        self.send_response(200)
-        self.send_header('Content-type', 'text/html')
-        self.end_headers()
-        html_content = """<!DOCTYPE html>
-<html>
-<head>
-    <title>My Website</title>
-</head>
-<body>
-    <h1>Welcome to My Website</h1>
-    <p>This page is served directly from the root URL.</p>
-</body>
-</html>"""
-        self.wfile.write(html_content.encode('utf-8'))
-    else:
-        self.handle_request('GET')
-
+        self._handle_request("GET")
 
     def do_POST(self):
         self._handle_request("POST")
