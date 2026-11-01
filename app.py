@@ -23,7 +23,7 @@ STYLE_CSS = '''
     --card-bg: #1e1e26;
     --text-color: #e0e0e0;
     --accent-color: #00bcd4;
-    --border-color: #333;
+    --border-color: #444;
     --input-bg: #2a2a36;
   }
   body {
@@ -49,6 +49,7 @@ STYLE_CSS = '''
     text-align: center;
     margin-bottom: 25px;
     font-weight: 600;
+    text-transform: uppercase;
   }
   .input-group {
     position: relative;
@@ -64,10 +65,6 @@ STYLE_CSS = '''
     font-size: 16px;
     box-sizing: border-box;
     transition: border-color 0.3s;
-    text-transform: uppercase;
-  }
-  .input-group input[type="password"] {
-    text-transform: none;
   }
   .input-group input:focus {
     outline: none;
@@ -83,6 +80,8 @@ STYLE_CSS = '''
     transition: 0.3s ease all;
     background-color: var(--input-bg);
     padding: 0 5px;
+    text-transform: uppercase;
+    font-size: 14px;
   }
   .input-group input:focus ~ label,
   .input-group input:not(:placeholder-shown) ~ label {
@@ -100,6 +99,7 @@ STYLE_CSS = '''
     color: var(--accent-color);
     cursor: pointer;
     font-size: 12px;
+    font-weight: bold;
   }
   button[type="submit"] {
     width: 100%;
@@ -112,6 +112,7 @@ STYLE_CSS = '''
     font-weight: bold;
     cursor: pointer;
     transition: background-color 0.3s;
+    text-transform: uppercase;
     border: 1px solid var(--accent-color);
   }
   button[type="submit"]:hover {
@@ -121,10 +122,14 @@ STYLE_CSS = '''
     text-align: center;
     margin-top: 15px;
   }
-  .footer-links a {
-    color: var(--accent-color);
+  .footer-links a, .footer-links p {
+    color: var(--text-color);
     text-decoration: none;
     font-size: 14px;
+  }
+  .footer-links a {
+    color: var(--accent-color);
+    font-weight: bold;
   }
   .footer-links a:hover {
     text-decoration: underline;
@@ -135,6 +140,7 @@ STYLE_CSS = '''
     margin-bottom: 15px;
     text-align: center;
     font-size: 14px;
+    text-transform: uppercase;
   }
   .flash-error { background-color: #ffebee; color: #c62828; border: 1px solid #ef9a9a; }
   .flash-success { background-color: #e8f5e9; color: #2e7d32; border: 1px solid #a5d6a7; }
@@ -145,7 +151,7 @@ BASE_TEMPLATE = '''
 <!DOCTYPE html>
 <html>
 <head>
-  <title>My Gateway</title>
+  <title>MY GATEWAY</title>
   ''' + STYLE_CSS + '''
 </head>
 <body>
@@ -157,7 +163,7 @@ BASE_TEMPLATE = '''
         {% endfor %}
       {% endif %}
     {% endwith %}
-    {% block content %}{% endblock %}
+    CONTENT_PLACEHOLDER
   </div>
 
   <script>
@@ -177,78 +183,70 @@ BASE_TEMPLATE = '''
 '''
 
 REGISTER_TEMPLATE = '''
-{% extends "base.html" %}
-{% block content %}
-<h2>Register</h2>
+<h2>REGISTER</h2>
 <form method="POST">
   <div class="input-group">
     <input type="text" name="username" id="username" placeholder=" " required>
-    <label for="username">Username</label>
+    <label for="username">USERNAME</label>
   </div>
   <div class="input-group">
-    <input type="email" name="email" id="email" placeholder=" " required style="text-transform: uppercase;">
-    <label for="email">Email Address</label>
+    <input type="email" name="email" id="email" placeholder=" " required>
+    <label for="email">EMAIL ADDRESS</label>
   </div>
   <div class="input-group">
     <input type="password" name="password" id="password" placeholder=" " required>
-    <label for="password">Password</label>
+    <label for="password">PASSWORD</label>
     <button type="button" class="show-password-btn" onclick="togglePassword('password', this)">SHOW</button>
   </div>
   <div class="input-group">
     <input type="password" name="confirm_password" id="confirm_password" placeholder=" " required>
-    <label for="confirm_password">Confirm Password</label>
+    <label for="confirm_password">CONFIRM PASSWORD</label>
     <button type="button" class="show-password-btn" onclick="togglePassword('confirm_password', this)">SHOW</button>
   </div>
   <button type="submit">REGISTER</button>
 </form>
 <div class="footer-links">
-  <p>Already have an account? <a href="{{ url_for('login') }}">Login</a></p>
+  <p><a href="{{ url_for('login') }}">ALREADY HAVE AN ACCOUNT? LOGIN</a></p>
 </div>
-{% endblock %}
 '''
 
 LOGIN_TEMPLATE = '''
-{% extends "base.html" %}
-{% block content %}
-<h2>Login</h2>
+<h2>LOGIN</h2>
 <form method="POST">
   <div class="input-group">
-    <input type="email" name="email" id="email" placeholder=" " required style="text-transform: uppercase;">
-    <label for="email">Email Address</label>
+    <input type="email" name="email" id="email" placeholder=" " required>
+    <label for="email">EMAIL ADDRESS</label>
   </div>
   <div class="input-group">
     <input type="password" name="password" id="password" placeholder=" " required>
-    <label for="password">Password</label>
+    <label for="password">PASSWORD</label>
     <button type="button" class="show-password-btn" onclick="togglePassword('password', this)">SHOW</button>
   </div>
   <button type="submit">LOGIN</button>
 </form>
 <div class="footer-links">
-  <p><a href="{{ url_for('forgot_password') }}">Forgot Password?</a></p>
-  <p>Don't have an account? <a href="{{ url_for('register') }}">Sign Up</a></p>
+  <p><a href="{{ url_for('forgot_password') }}">FORGOT PASSWORD?</a></p>
+  <p><a href="{{ url_for('register') }}">DON'T HAVE AN ACCOUNT? SIGN UP</a></p>
 </div>
-{% endblock %}
 '''
 
 FORGOT_PASSWORD_TEMPLATE = '''
-{% extends "base.html" %}
-{% block content %}
-<h2>Forgot Password</h2>
+<h2>FORGOT PASSWORD</h2>
 <form method="POST">
   <div class="input-group">
-    <input type="email" name="email" id="email" placeholder=" " required style="text-transform: uppercase;">
-    <label for="email">Enter your email</label>
+    <input type="email" name="email" id="email" placeholder=" " required>
+    <label for="email">ENTER YOUR EMAIL</label>
   </div>
   <button type="submit">SEND OTP</button>
 </form>
 <div class="footer-links">
-  <p><a href="{{ url_for('login') }}">Back to Login</a></p>
+  <p><a href="{{ url_for('login') }}">BACK TO LOGIN</a></p>
 </div>
-{% endblock %}
 '''
 
 def render_custom_template(template_str, **context):
-    return render_template_string(BASE_TEMPLATE + template_str, **context)
+    full_html = BASE_TEMPLATE.replace('CONTENT_PLACEHOLDER', template_str)
+    return render_template_string(full_html, **context)
 
 @app.route('/')
 def index():
@@ -263,10 +261,10 @@ def register():
         confirm_password = request.form.get('confirm_password')
         
         if password != confirm_password:
-            flash("Passwords do not match!", "error")
+            flash("PASSWORDS DO NOT MATCH!", "error")
             return render_custom_template(REGISTER_TEMPLATE)
         
-        flash("Account created! Please log in.", "success")
+        flash("ACCOUNT CREATED! PLEASE LOG IN.", "success")
         return redirect(url_for('login'))
         
     return render_custom_template(REGISTER_TEMPLATE)
@@ -277,7 +275,7 @@ def login():
         email = request.form.get('email')
         password = request.form.get('password')
         
-        flash("Login successful!", "success")
+        flash("LOGIN SUCCESSFUL!", "success")
         return redirect(url_for('login'))
         
     return render_custom_template(LOGIN_TEMPLATE)
@@ -290,11 +288,11 @@ def forgot_password():
             msg = Message("Password Reset OTP", recipients=[email])
             msg.body = "Your OTP is 123456"
             mail.send(msg)
-            flash("OTP sent to your email.", "success")
+            flash("OTP SENT TO YOUR EMAIL.", "success")
             return redirect(url_for('login'))
         except Exception as e:
             print(f"Error sending email: {e}")
-            flash(f"Failed to send email: {e}", "error")
+            flash(f"FAILED TO SEND EMAIL: {e}", "error")
             return render_custom_template(FORGOT_PASSWORD_TEMPLATE)
             
     return render_custom_template(FORGOT_PASSWORD_TEMPLATE)
