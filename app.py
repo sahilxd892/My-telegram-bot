@@ -1,21 +1,21 @@
 import os
-from flask import Flask, render_template, request, redirect, url_for, flash, render_template_string
+from flask import Flask, render_template_string, request, redirect, url_for, flash
 from flask_mail import Mail, Message
 
 app = Flask(__name__)
-app.secret_key = 'secret_key_123'
+app.secret_key = 'your_secret_key'
 
-# Configure Flask-Mail
-app.config['MAIL_SERVER'] = 'smtp.gmail.com'
-app.config['MAIL_PORT'] = 587
-app.config['MAIL_USE_TLS'] = True
-app.config['MAIL_USERNAME'] = 'sahilxd892@gmail.com' 
-app.config['MAIL_PASSWORD'] = 'hgimjdjpspvodquk'
-app.config['MAIL_DEFAULT_SENDER'] = 'sahilxd892@gmail.com'
+# Configure Flask-Mail using Environment Variables
+app.config['MAIL_SERVER'] = os.environ.get('MAIL_SERVER', 'smtp.gmail.com')
+app.config['MAIL_PORT'] = int(os.environ.get('MAIL_PORT', 587))
+app.config['MAIL_USE_TLS'] = os.environ.get('MAIL_USE_TLS', 'True') == 'True'
+app.config['MAIL_USERNAME'] = os.environ.get('MAIL_USERNAME')
+app.config['MAIL_PASSWORD'] = os.environ.get('MAIL_PASSWORD')
+app.config['MAIL_DEFAULT_SENDER'] = os.environ.get('MAIL_DEFAULT_SENDER')
 
 mail = Mail(app)
 
-CSS_STYLES = '''
+STYLE_CSS = '''
 <style>
   :root {
     --primary-color: #4a90e2;
@@ -23,6 +23,8 @@ CSS_STYLES = '''
     --card-bg: #1e1e26;
     --text-color: #e0e0e0;
     --accent-color: #00bcd4;
+    --border-color: #333;
+    --input-bg: #2a2a36;
   }
   body {
     background-color: var(--bg-color);
@@ -40,63 +42,213 @@ CSS_STYLES = '''
     box-shadow: 0 8px 24px rgba(0,0,0,0.5);
     width: 100%;
     max-width: 400px;
-    border: 1px solid #333;
+    border: 2px solid var(--accent-color);
   }
-  h2 { color: var(--text-color); text-align: center; margin-bottom: 25px; font-weight: 600; }
-  .input-group { position: relative; margin-bottom: 20px; }
+  h2 {
+    color: var(--text-color);
+    text-align: center;
+    margin-bottom: 25px;
+    font-weight: 600;
+  }
+  .input-group {
+    position: relative;
+    margin-bottom: 20px;
+  }
   .input-group input {
-    width: 100%; padding: 12px 15px; background-color: #2a2a36;
-    border: 1px solid #444; border-radius: 8px; color: var(--text-color);
-    font-size: 16px; box-sizing: border-box; transition: border-color 0.3s;
-    text-transform: none; /* Allows free typing of upper and lower case */
+    width: 100%;
+    padding: 12px 15px;
+    background-color: var(--input-bg);
+    border: 2px solid var(--border-color);
+    border-radius: 8px;
+    color: var(--text-color);
+    font-size: 16px;
+    box-sizing: border-box;
+    transition: border-color 0.3s;
+    text-transform: uppercase;
   }
-  .input-group input:focus { outline: none; border-color: var(--accent-color); }
+  .input-group input[type="password"] {
+    text-transform: none;
+  }
+  .input-group input:focus {
+    outline: none;
+    border-color: var(--accent-color);
+  }
   .input-group label {
-    position: absolute; left: 15px; top: 50%; transform: translateY(-50%);
-    color: #888; pointer-events: none; transition: 0.3s ease all;
-    background-color: #2a2a36; padding: 0 5px;
+    position: absolute;
+    left: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #888;
+    pointer-events: none;
+    transition: 0.3s ease all;
+    background-color: var(--input-bg);
+    padding: 0 5px;
   }
-  .input-group input:focus ~ label, .input-group input:not(:placeholder-shown) ~ label {
-    top: 0; font-size: 12px; color: var(--accent-color);
+  .input-group input:focus ~ label,
+  .input-group input:not(:placeholder-shown) ~ label {
+    top: 0;
+    font-size: 12px;
+    color: var(--accent-color);
   }
-  button {
-    width: 100%; padding: 12px; background-color: var(--primary-color);
-    border: none; border-radius: 8px; color: white; font-size: 16px;
-    font-weight: bold; cursor: pointer; transition: background-color 0.3s;
+  .show-password-btn {
+    position: absolute;
+    right: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    color: var(--accent-color);
+    cursor: pointer;
+    font-size: 12px;
   }
-  button:hover { background-color: #357abd; }
-  .footer-links { text-align: center; margin-top: 15px; }
-  .footer-links a { color: var(--accent-color); text-decoration: none; font-size: 14px; }
-  .footer-links a:hover { text-decoration: underline; }
-  .flash-msg { padding: 10px; border-radius: 6px; margin-bottom: 15px; text-align: center; font-size: 14px; }
+  button[type="submit"] {
+    width: 100%;
+    padding: 12px;
+    background-color: var(--primary-color);
+    border: none;
+    border-radius: 8px;
+    color: white;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    border: 1px solid var(--accent-color);
+  }
+  button[type="submit"]:hover {
+    background-color: #357abd;
+  }
+  .footer-links {
+    text-align: center;
+    margin-top: 15px;
+  }
+  .footer-links a {
+    color: var(--accent-color);
+    text-decoration: none;
+    font-size: 14px;
+  }
+  .footer-links a:hover {
+    text-decoration: underline;
+  }
+  .flash-msg {
+    padding: 10px;
+    border-radius: 6px;
+    margin-bottom: 15px;
+    text-align: center;
+    font-size: 14px;
+  }
   .flash-error { background-color: #ffebee; color: #c62828; border: 1px solid #ef9a9a; }
   .flash-success { background-color: #e8f5e9; color: #2e7d32; border: 1px solid #a5d6a7; }
 </style>
 '''
 
-def render_page(title, body_content):
-    html = f'''
-    <!DOCTYPE html>
-    <html>
-    <head>
-        <title>{title}</title>
-        {CSS_STYLES}
-    </head>
-    <body>
-        <div class="auth-card">
-            {{% with messages = get_flashed_messages(with_categories=true) %}}
-                {{% if messages %}}
-                    {{% for category, message in messages %}}
-                        <div class="flash-msg flash-{{ category }}">{{ message }}</div>
-                    {{% endfor %}}
-                {{% endif %}}
-            {{% endwith %}}
-            {body_content}
-        </div>
-    </body>
-    </html>
-    '''
-    return render_template_string(html)
+BASE_TEMPLATE = '''
+<!DOCTYPE html>
+<html>
+<head>
+  <title>My Gateway</title>
+  ''' + STYLE_CSS + '''
+</head>
+<body>
+  <div class="auth-card">
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        {% for category, message in messages %}
+          <div class="flash-msg flash-{{ category }}">{{ message }}</div>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+    {% block content %}{% endblock %}
+  </div>
+
+  <script>
+    function togglePassword(inputId, btnElement) {
+      const input = document.getElementById(inputId);
+      if (input.type === "password") {
+        input.type = "text";
+        btnElement.textContent = "HIDE";
+      } else {
+        input.type = "password";
+        btnElement.textContent = "SHOW";
+      }
+    }
+  </script>
+</body>
+</html>
+'''
+
+REGISTER_TEMPLATE = '''
+{% extends "base.html" %}
+{% block content %}
+<h2>Register</h2>
+<form method="POST">
+  <div class="input-group">
+    <input type="text" name="username" id="username" placeholder=" " required>
+    <label for="username">Username</label>
+  </div>
+  <div class="input-group">
+    <input type="email" name="email" id="email" placeholder=" " required style="text-transform: uppercase;">
+    <label for="email">Email Address</label>
+  </div>
+  <div class="input-group">
+    <input type="password" name="password" id="password" placeholder=" " required>
+    <label for="password">Password</label>
+    <button type="button" class="show-password-btn" onclick="togglePassword('password', this)">SHOW</button>
+  </div>
+  <div class="input-group">
+    <input type="password" name="confirm_password" id="confirm_password" placeholder=" " required>
+    <label for="confirm_password">Confirm Password</label>
+    <button type="button" class="show-password-btn" onclick="togglePassword('confirm_password', this)">SHOW</button>
+  </div>
+  <button type="submit">REGISTER</button>
+</form>
+<div class="footer-links">
+  <p>Already have an account? <a href="{{ url_for('login') }}">Login</a></p>
+</div>
+{% endblock %}
+'''
+
+LOGIN_TEMPLATE = '''
+{% extends "base.html" %}
+{% block content %}
+<h2>Login</h2>
+<form method="POST">
+  <div class="input-group">
+    <input type="email" name="email" id="email" placeholder=" " required style="text-transform: uppercase;">
+    <label for="email">Email Address</label>
+  </div>
+  <div class="input-group">
+    <input type="password" name="password" id="password" placeholder=" " required>
+    <label for="password">Password</label>
+    <button type="button" class="show-password-btn" onclick="togglePassword('password', this)">SHOW</button>
+  </div>
+  <button type="submit">LOGIN</button>
+</form>
+<div class="footer-links">
+  <p><a href="{{ url_for('forgot_password') }}">Forgot Password?</a></p>
+  <p>Don't have an account? <a href="{{ url_for('register') }}">Sign Up</a></p>
+</div>
+{% endblock %}
+'''
+
+FORGOT_PASSWORD_TEMPLATE = '''
+{% extends "base.html" %}
+{% block content %}
+<h2>Forgot Password</h2>
+<form method="POST">
+  <div class="input-group">
+    <input type="email" name="email" id="email" placeholder=" " required style="text-transform: uppercase;">
+    <label for="email">Enter your email</label>
+  </div>
+  <button type="submit">SEND OTP</button>
+</form>
+<div class="footer-links">
+  <p><a href="{{ url_for('login') }}">Back to Login</a></p>
+</div>
+{% endblock %}
+'''
+
+def render_custom_template(template_str, **context):
+    return render_template_string(BASE_TEMPLATE + template_str, **context)
 
 @app.route('/')
 def index():
@@ -105,57 +257,30 @@ def index():
 @app.route('/register', methods=['GET', 'POST'])
 def register():
     if request.method == 'POST':
-        flash("Registration successful!", "success")
+        username = request.form.get('username')
+        email = request.form.get('email')
+        password = request.form.get('password')
+        confirm_password = request.form.get('confirm_password')
+        
+        if password != confirm_password:
+            flash("Passwords do not match!", "error")
+            return render_custom_template(REGISTER_TEMPLATE)
+        
+        flash("Account created! Please log in.", "success")
         return redirect(url_for('login'))
-    
-    content = f'''
-    <h2>Register</h2>
-    <form action="{{{{ url_for('register') }}}}" method="POST">
-        <div class="input-group">
-            <input type="text" name="username" id="username" placeholder=" " required>
-            <label for="username">Username</label>
-        </div>
-        <div class="input-group">
-            <input type="email" name="email" id="email" placeholder=" " required>
-            <label for="email">Email Address</label>
-        </div>
-        <div class="input-group">
-            <input type="password" name="password" id="password" placeholder=" " required>
-            <label for="password">Password</label>
-        </div>
-        <button type="submit">REGISTER</button>
-    </form>
-    <div class="footer-links">
-        <p>Already have an account? <a href="{{{{ url_for('login') }}}}">Login</a></p>
-    </div>
-    '''
-    return render_page("Register", content)
+        
+    return render_custom_template(REGISTER_TEMPLATE)
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
-        flash("Login successful!", "success")
-        return redirect(url_for('index'))
+        email = request.form.get('email')
+        password = request.form.get('password')
         
-    content = f'''
-    <h2>Login</h2>
-    <form action="{{{{ url_for('login') }}}}" method="POST">
-        <div class="input-group">
-            <input type="email" name="email" id="email" placeholder=" " required>
-            <label for="email">Email Address</label>
-        </div>
-        <div class="input-group">
-            <input type="password" name="password" id="password" placeholder=" " required>
-            <label for="password">Password</label>
-        </div>
-        <button type="submit">LOGIN</button>
-    </form>
-    <div class="footer-links">
-        <p><a href="{{{{ url_for('forgot_password') }}}}">Forgot Password?</a></p>
-        <p>Don't have an account? <a href="{{{{ url_for('register') }}}}">Sign Up</a></p>
-    </div>
-    '''
-    return render_page("Login", content)
+        flash("Login successful!", "success")
+        return redirect(url_for('login'))
+        
+    return render_custom_template(LOGIN_TEMPLATE)
 
 @app.route('/forgot_password', methods=['GET', 'POST'])
 def forgot_password():
@@ -168,22 +293,11 @@ def forgot_password():
             flash("OTP sent to your email.", "success")
             return redirect(url_for('login'))
         except Exception as e:
-            flash(f"Failed to send email.", "error")
-    
-    content = f'''
-    <h2>Forgot Password</h2>
-    <form action="{{{{ url_for('forgot_password') }}}}" method="POST">
-        <div class="input-group">
-            <input type="email" name="email" id="email" placeholder=" " required>
-            <label for="email">Enter your email</label>
-        </div>
-        <button type="submit">SEND OTP</button>
-    </form>
-    <div class="footer-links">
-        <p><a href="{{{{ url_for('login') }}}}">Back to Login</a></p>
-    </div>
-    '''
-    return render_page("Forgot Password", content)
+            print(f"Error sending email: {e}")
+            flash(f"Failed to send email: {e}", "error")
+            return render_custom_template(FORGOT_PASSWORD_TEMPLATE)
+            
+    return render_custom_template(FORGOT_PASSWORD_TEMPLATE)
 
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 5000))
