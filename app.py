@@ -6,7 +6,7 @@ LOGIN_HTML = '''
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Login</title>
+    <title>LOGIN</title>
     <style>
         @property {
             syntax: '<angle>';
@@ -42,25 +42,25 @@ LOGIN_HTML = '''
         }
         h2 { color: #fff; margin-bottom: 25px; font-weight: bold; letter-spacing: 1px; }
         .input-group {
-            position: relative; margin-bottom: 20px;
+            margin-bottom: 20px;
         }
         input {
-            width: 100%; padding: 14px 40px 14px 15px; background: #16213e;
-            border: 1px solid #533483; border-radius: 10px; color: white;
+            width: 100%; padding: 14px 15px; background: #16213e;
+            border: none; border-radius: 10px; color: white;
             box-sizing: border-box; font-size: 16px; outline: none;
+            text-transform: uppercase;
         }
-        input:focus { border-color: #2ed573; }
-        .toggle-password {
-            position: absolute; right: 12px; top: 50%; transform: translateY(-50%);
-            background: none; border: none; color: #888; cursor: pointer; font-size: 16px;
+        input::placeholder {
+            color: #888;
         }
         button {
             width: 100%; background: linear-gradient(to right, #ff4757, #ff6b81); color: white;
             padding: 14px; border: none; border-radius: 10px; cursor: pointer;
             font-size: 18px; font-weight: bold; margin-top: 10px; box-shadow: 0 4px 15px rgba(255,71,87,0.4);
+            text-transform: uppercase;
         }
         .links { margin-top: 20px; font-size: 14px; display: flex; justify-content: space-between; }
-        .links a { color: #4ecca3; text-decoration: none; }
+        .links a { color: #4ecca3; text-decoration: none; text-transform: uppercase; }
         .links a:hover { text-decoration: underline; }
     </style>
 </head>
@@ -69,32 +69,20 @@ LOGIN_HTML = '''
         <h2>LOGIN</h2>
         <form method="POST">
             <div class="input-group">
-                <input type="text" name="email" placeholder="Email Address" required>
+                <input type="text" name="email" placeholder="EMAIL ADDRESS" required>
             </div>
             <div class="input-group">
-                <input type="password" name="password" id="login-pass" placeholder="Password" required>
-                <button type="button" class="toggle-password" onclick="togglePass('login-pass')">👁️</button>
+                <input type="password" name="password" placeholder="PASSWORD" required>
             </div>
             <div class="links" style="justify-content: flex-end;">
-                <a href="#">Forgot password?</a>
+                <a href="#">FORGOT PASSWORD?</a>
             </div>
-            <button type="submit">Login</button>
+            <button type="submit">LOGIN</button>
         </form>
         <div class="links">
-            <span>Don't have an account? <a href="/register">Sign up</a></span>
+            <span>DON'T HAVE AN ACCOUNT? <a href="/register">SIGN UP</a></span>
         </div>
     </div>
-
-    <script>
-        function togglePass(id) {
-            const input = document.getElementById(id);
-            if (input.type === "password") {
-                input.type = "text";
-            } else {
-                input.type = "password";
-            }
-        }
-    </script>
 </body>
 </html>
 '''
@@ -103,7 +91,7 @@ REGISTER_HTML = '''
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Register</title>
+    <title>REGISTER</title>
     <style>
         @property {
             syntax: '<angle>';
@@ -139,25 +127,25 @@ REGISTER_HTML = '''
         }
         h2 { color: #fff; margin-bottom: 25px; font-weight: bold; letter-spacing: 1px; }
         .input-group {
-            position: relative; margin-bottom: 20px;
+            margin-bottom: 20px;
         }
         input {
-            width: 100%; padding: 14px 40px 14px 15px; background: #16213e;
-            border: 1px solid #533483; border-radius: 10px; color: white;
+            width: 100%; padding: 14px 15px; background: #16213e;
+            border: none; border-radius: 10px; color: white;
             box-sizing: border-box; font-size: 16px; outline: none;
+            text-transform: uppercase;
         }
-        input:focus { border-color: #2ed573; }
-        .toggle-password {
-            position: absolute; right: 12px; top: 50%; transform: translateY(-50%);
-            background: none; border: none; color: #888; cursor: pointer; font-size: 16px;
+        input::placeholder {
+            color: #888;
         }
         button {
             width: 100%; background: linear-gradient(to right, #2ed573, #26af5a); color: white;
             padding: 14px; border: none; border-radius: 10px; cursor: pointer;
             font-size: 18px; font-weight: bold; margin-top: 10px; box-shadow: 0 4px 15px rgba(46,213,115,0.4);
+            text-transform: uppercase;
         }
         .links { margin-top: 20px; font-size: 14px; }
-        .links a { color: #4ecca3; text-decoration: none; }
+        .links a { color: #4ecca3; text-decoration: none; text-transform: uppercase; }
         .links a:hover { text-decoration: underline; }
     </style>
 </head>
@@ -166,36 +154,23 @@ REGISTER_HTML = '''
         <h2>REGISTER</h2>
         <form method="POST">
             <div class="input-group">
-                <input type="text" name="username" placeholder="Username" required>
+                <input type="text" name="username" placeholder="USERNAME" required>
             </div>
             <div class="input-group">
-                <input type="text" name="email" placeholder="Email Address" required>
+                <input type="text" name="email" placeholder="EMAIL ADDRESS" required>
             </div>
             <div class="input-group">
-                <input type="password" name="password" id="reg-pass" placeholder="Password" required>
-                <button type="button" class="toggle-password" onclick="togglePass('reg-pass')">👁️</button>
+                <input type="password" name="password" placeholder="PASSWORD" required>
             </div>
             <div class="input-group">
-                <input type="password" name="confirm_password" id="conf-pass" placeholder="Confirm Password" required>
-                <button type="button" class="toggle-password" onclick="togglePass('conf-pass')">👁️</button>
+                <input type="password" name="confirm_password" placeholder="CONFIRM PASSWORD" required>
             </div>
-            <button type="submit">Register</button>
+            <button type="submit">REGISTER</button>
         </form>
         <div class="links">
-            <a href="/">Back to Login</a>
+            <a href="/">BACK TO LOGIN</a>
         </div>
     </div>
-
-    <script>
-        function togglePass(id) {
-            const input = document.getElementById(id);
-            if (input.type === "password") {
-                input.type = "text";
-            } else {
-                input.type = "password";
-            }
-        }
-    </script>
 </body>
 </html>
 '''
@@ -204,14 +179,14 @@ REGISTER_HTML = '''
 def login():
     if request.method == 'POST':
         email = request.form['email']
-        return f'Welcome back, user with email {email}!'
+        return f'WELCOME BACK, USER WITH EMAIL {email}!'
     return render_template_string(LOGIN_HTML)
 
 @app.route('/register', methods=['GET', 'POST'])
 def register():
     if request.method == 'POST':
         user = request.form['username']
-        return f'Account created for {user}!'
+        return f'ACCOUNT CREATED FOR {user}!'
     return render_template_string(REGISTER_HTML)
 
 if __name__ == '__main__':
