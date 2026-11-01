@@ -2,63 +2,122 @@ from flask import Flask, render_template_string, request
 
 app = Flask(__name__)
 
-LOGIN_HTML = '''
+# UPDATED CSS AND HTML TEMPLATES WITH HIGHLY VISIBLE BORDER AND CAPITALIZED TEXT
+
+BASE_STYLE = '''
+<style>
+    @property {
+        syntax: '<angle>';
+        inherits: false;
+        initial-value: 0deg;
+    }
+    @keyframes rotate {
+        0% { --angle: 0deg; }
+        100% { --angle: 360deg; }
+    }
+    body {
+        margin: 0;
+        padding: 0;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        background: linear-gradient(135deg, #0a0a16 0%, #1a1a2e 100%);
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+    .glow-card {
+        position: relative;
+        background: #0f3460;
+        padding: 40px;
+        border-radius: 20px;
+        width: 320px;
+        text-align: center;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+    }
+    .glow-card::before {
+        content: '';
+        position: absolute;
+        inset: -6px;
+        border-radius: 24px;
+        background: conic-gradient(from var(--angle), #00d2ff, #0052ff, #00d2ff, #00f2fe, #00d2ff);
+        animation: rotate 8s linear infinite; /* Slower rotation */
+        z-index: -1;
+    }
+    h2 {
+        color: #fff;
+        margin-bottom: 30px;
+        font-weight: bold;
+        letter-spacing: 2px;
+        text-transform: uppercase;
+    }
+    .input-group {
+        margin-bottom: 25px;
+        text-align: left;
+    }
+    input {
+        width: 100%;
+        padding: 15px;
+        background: #16213e;
+        border: 2px solid transparent; /* Invisible border when empty */
+        border-radius: 12px;
+        color: white;
+        box-sizing: border-box;
+        font-size: 16px;
+        outline: none;
+        transition: border-color 0.3s ease, box-shadow 0.3s ease;
+        text-transform: uppercase; /* Typed text strictly uppercase */
+    }
+    input::placeholder {
+        color: #666; /* Visible placeholder */
+        text-transform: uppercase; /* Placeholder strictly uppercase */
+        opacity: 1;
+    }
+    input:focus {
+        border-color: #00d2ff; /* Bright blue border on click */
+        box-shadow: 0 0 15px rgba(0, 210, 255, 0.6);
+    }
+    button {
+        width: 100%;
+        background: linear-gradient(to right, #00d2ff, #2563eb);
+        color: white;
+        padding: 16px;
+        border: none;
+        border-radius: 12px;
+        cursor: pointer;
+        font-size: 18px;
+        font-weight: bold;
+        margin-top: 10px;
+        text-transform: uppercase;
+        box-shadow: 0 4px 15px rgba(0, 210, 255, 0.3);
+        transition: transform 0.1s;
+    }
+    button:active {
+        transform: scale(0.98);
+    }
+    .links {
+        margin-top: 25px;
+        font-size: 14px;
+        display: flex;
+        justify-content: space-between;
+    }
+    .links a {
+        color: #00d2ff;
+        text-decoration: none;
+        text-transform: uppercase;
+        font-weight: 500;
+    }
+    .links a:hover {
+        text-decoration: underline;
+    }
+</style>
+'''
+
+LOGIN_HTML = f'''
 <!DOCTYPE html>
 <html>
 <head>
     <title>LOGIN</title>
-    <style>
-        @property {
-            syntax: '<angle>';
-            inherits: false;
-            initial-value: 0deg;
-        }
-        @keyframes rotate {
-            0% { --angle: 0deg; }
-            100% { --angle: 360deg; }
-        }
-        body {
-            margin: 0; padding: 0; display: flex; justify-content: center; align-items: center; height: 100vh;
-            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
-        .glow-card {
-            position: relative;
-            background: #0f3460; padding: 40px; border-radius: 20px;
-            width: 320px; text-align: center;
-        }
-        .glow-card::before {
-            content: '';
-            position: absolute;
-            inset: -3px;
-            border-radius: 23px;
-            background: conic-gradient(from var(--angle), #00d2ff, #2563eb, #00d2ff);
-            animation: rotate 4s linear infinite;
-            z-index: -1;
-        }
-        h2 { color: #fff; margin-bottom: 25px; font-weight: bold; letter-spacing: 1px; }
-        .input-group {
-            margin-bottom: 20px;
-        }
-        input {
-            width: 100%; padding: 14px 15px; background: #16213e;
-            border: 1px solid #2563eb; border-radius: 10px; color: white;
-            box-sizing: border-box; font-size: 16px; outline: none;
-        }
-        input::placeholder {
-            color: #888;
-            text-transform: uppercase;
-        }
-        button {
-            width: 100%; background: linear-gradient(to right, #00d2ff, #2563eb); color: white;
-            padding: 14px; border: none; border-radius: 10px; cursor: pointer;
-            font-size: 18px; font-weight: bold; margin-top: 10px;
-            text-transform: uppercase;
-        }
-        .links { margin-top: 20px; font-size: 14px; display: flex; justify-content: space-between; }
-        .links a { color: #00d2ff; text-decoration: none; text-transform: uppercase; }
-        .links a:hover { text-decoration: underline; }
-    </style>
+    {BASE_STYLE}
 </head>
 <body>
     <div class="glow-card">
@@ -83,63 +142,12 @@ LOGIN_HTML = '''
 </html>
 '''
 
-REGISTER_HTML = '''
+REGISTER_HTML = f'''
 <!DOCTYPE html>
 <html>
 <head>
     <title>REGISTER</title>
-    <style>
-        @property {
-            syntax: '<angle>';
-            inherits: false;
-            initial-value: 0deg;
-        }
-        @keyframes rotate {
-            0% { --angle: 0deg; }
-            100% { --angle: 360deg; }
-        }
-        body {
-            margin: 0; padding: 0; display: flex; justify-content: center; align-items: center; height: 100vh;
-            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
-        .glow-card {
-            position: relative;
-            background: #0f3460; padding: 40px; border-radius: 20px;
-            width: 320px; text-align: center;
-        }
-        .glow-card::before {
-            content: '';
-            position: absolute;
-            inset: -3px;
-            border-radius: 23px;
-            background: conic-gradient(from var(--angle), #00d2ff, #2563eb, #00d2ff);
-            animation: rotate 4s linear infinite;
-            z-index: -1;
-        }
-        h2 { color: #fff; margin-bottom: 25px; font-weight: bold; letter-spacing: 1px; }
-        .input-group {
-            margin-bottom: 20px;
-        }
-        input {
-            width: 100%; padding: 14px 15px; background: #16213e;
-            border: 1px solid #2563eb; border-radius: 10px; color: white;
-            box-sizing: border-box; font-size: 16px; outline: none;
-        }
-        input::placeholder {
-            color: #888;
-            text-transform: uppercase;
-        }
-        button {
-            width: 100%; background: linear-gradient(to right, #00d2ff, #2563eb); color: white;
-            padding: 14px; border: none; border-radius: 10px; cursor: pointer;
-            font-size: 18px; font-weight: bold; margin-top: 10px;
-            text-transform: uppercase;
-        }
-        .links { margin-top: 20px; font-size: 14px; }
-        .links a { color: #00d2ff; text-decoration: none; text-transform: uppercase; }
-        .links a:hover { text-decoration: underline; }
-    </style>
+    {BASE_STYLE}
 </head>
 <body>
     <div class="glow-card">
