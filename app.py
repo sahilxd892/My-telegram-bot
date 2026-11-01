@@ -48,6 +48,7 @@ CSS_STYLES = '''
     width: 100%; padding: 12px 15px; background-color: #2a2a36;
     border: 1px solid #444; border-radius: 8px; color: var(--text-color);
     font-size: 16px; box-sizing: border-box; transition: border-color 0.3s;
+    text-transform: none; /* Allows free typing of upper and lower case */
   }
   .input-group input:focus { outline: none; border-color: var(--accent-color); }
   .input-group label {
@@ -109,7 +110,7 @@ def register():
     
     content = f'''
     <h2>Register</h2>
-    <form method="POST">
+    <form action="{{{{ url_for('register') }}}}" method="POST">
         <div class="input-group">
             <input type="text" name="username" id="username" placeholder=" " required>
             <label for="username">Username</label>
@@ -125,7 +126,7 @@ def register():
         <button type="submit">REGISTER</button>
     </form>
     <div class="footer-links">
-        <p>Already have an account? <a href="{url_for('login')}">Login</a></p>
+        <p>Already have an account? <a href="{{{{ url_for('login') }}}}">Login</a></p>
     </div>
     '''
     return render_page("Register", content)
@@ -138,7 +139,7 @@ def login():
         
     content = f'''
     <h2>Login</h2>
-    <form method="POST">
+    <form action="{{{{ url_for('login') }}}}" method="POST">
         <div class="input-group">
             <input type="email" name="email" id="email" placeholder=" " required>
             <label for="email">Email Address</label>
@@ -150,8 +151,8 @@ def login():
         <button type="submit">LOGIN</button>
     </form>
     <div class="footer-links">
-        <p><a href="{url_for('forgot_password')}">Forgot Password?</a></p>
-        <p>Don't have an account? <a href="{url_for('register')}">Sign Up</a></p>
+        <p><a href="{{{{ url_for('forgot_password') }}}}">Forgot Password?</a></p>
+        <p>Don't have an account? <a href="{{{{ url_for('register') }}}}">Sign Up</a></p>
     </div>
     '''
     return render_page("Login", content)
@@ -171,7 +172,7 @@ def forgot_password():
     
     content = f'''
     <h2>Forgot Password</h2>
-    <form method="POST">
+    <form action="{{{{ url_for('forgot_password') }}}}" method="POST">
         <div class="input-group">
             <input type="email" name="email" id="email" placeholder=" " required>
             <label for="email">Enter your email</label>
@@ -179,7 +180,7 @@ def forgot_password():
         <button type="submit">SEND OTP</button>
     </form>
     <div class="footer-links">
-        <p><a href="{url_for('login')}">Back to Login</a></p>
+        <p><a href="{{{{ url_for('login') }}}}">Back to Login</a></p>
     </div>
     '''
     return render_page("Forgot Password", content)
