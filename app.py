@@ -3,6 +3,10 @@ import time
 import random
 import qrcode
 app = Flask(__name__)
+@app.route('/')
+def home():
+    return "QR Code Generator is working!"
+
 def generate_order_id():
     return "ORD-" + str(int(time.time())) + "-" + str(random.randint(1000, 9999))
 
