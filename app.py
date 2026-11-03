@@ -13,8 +13,9 @@ def home():
         p { color: #666; font-size: 14px; margin-bottom: 20px; }
         input[type="text"], input[type="password"] { width: 100%; padding: 10px; margin: 10px 0; border: 1px solid #ddd; border-radius: 4px; box-sizing: border-box; }
         .btn { display: block; width: 100%; padding: 10px; background-color: #007bff; color: white; border: none; border-radius: 4px; margin-top: 15px; text-decoration: none; font-size: 16px; cursor: pointer; }
-        .links { margin: 10px 0 15px 0; font-size: 12px; display: flex; justify-content: space-between; align-items: center; }
-        .links a { color: #007bff; text-decoration: none; }
+        .forgot-link { text-align: right; margin-top: 5px; font-size: 12px; }
+        .forgot-link a, .create-link a { color: #007bff; text-decoration: none; }
+        .create-link { text-align: center; margin-top: 15px; font-size: 12px; }
     </style>
 </head>
 <body>
@@ -23,11 +24,13 @@ def home():
         <form action="#" method="POST">
             <input type="text" placeholder="Email" required>
             <input type="password" placeholder="Password" required>
-            <div class="links">
+            <div class="forgot-link">
                 <a href="#">Forgot Password?</a>
-                <a href="#">Create Account</a>
             </div>
             <button type="submit" class="btn">Sign In</button>
+            <div class="create-link">
+                <a href="#">Create Account</a>
+            </div>
         </form>
     </div>
 </body>
