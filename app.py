@@ -1,3 +1,4 @@
+from flask import Flask
 import time
 import random
 import qrcode
