@@ -13,3 +13,5 @@ def generate_qr(order_id, amount):
 order_id = generate_order_id()
 generate_qr(order_id, 100)
 print(f"Generated Order ID: {order_id}")
+if __name__ == '__main__':
+    app.run(host='0.0.0.0', port=10000)
