@@ -24,18 +24,19 @@ def home():
 <body>
     <h1>Login</h1>
     <div class="box">
-        <p>Instant delivery guaranteed upon payment verification.</p>
+        <p>Login</p>
         <form action="#" method="POST">
             <input type="text" placeholder="Email" required>
             <input type="password" placeholder="Password" required>
+            <div class="links">
+                <a href="#">Forgot Password?</a> | <a href="#">Create Account</a>
+            </div>
             <button type="submit" class="btn">Sign In</button>
         </form>
-        <div class="links">
-            <a href="#">Forgot Password?</a> | <a href="#">Create Account</a>
-        </div>
     </div>
 </body>
 </html>''')
+
 
 
 
