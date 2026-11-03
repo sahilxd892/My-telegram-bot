@@ -11,9 +11,9 @@ def home():
 <html>
 <head>
     <style>
-        body { font-family: Arial, sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; background-color: #f0f2f5; margin: 0; }
+        body { font-family: Arial, sans-serif; display: flex; flex-direction: column; justify-content: center; align-items: center; height: 100vh; background-color: #f0f2f5; margin: 0; }
+        h1 { color: #333; margin-bottom: 20px; }
         .box { background-color: white; padding: 30px; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); width: 300px; text-align: center; }
-        h2 { color: #333; margin-top: 0; }
         p { color: #666; font-size: 14px; margin-bottom: 20px; }
         input[type="text"], input[type="password"] { width: 100%; padding: 10px; margin: 10px 0; border: 1px solid #ddd; border-radius: 4px; box-sizing: border-box; }
         .btn { display: block; width: 100%; padding: 10px; background-color: #007bff; color: white; border: none; border-radius: 4px; margin-top: 15px; text-decoration: none; font-size: 16px; cursor: pointer; }
@@ -22,8 +22,8 @@ def home():
     </style>
 </head>
 <body>
+    <h1>Login</h1>
     <div class="box">
-        <h2>Email Check Gateway</h2>
         <p>Instant delivery guaranteed upon payment verification.</p>
         <form action="#" method="POST">
             <input type="text" placeholder="Email" required>
@@ -36,6 +36,7 @@ def home():
     </div>
 </body>
 </html>''')
+
 
 
 
