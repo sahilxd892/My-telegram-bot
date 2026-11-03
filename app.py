@@ -2,7 +2,7 @@ from flask import Flask
 import time
 import random
 import qrcode
-Flask app = Flask(__name__)
+app = Flask(__name__)
 def generate_order_id():
     return "ORD-" + str(int(time.time())) + "-" + str(random.randint(1000, 9999))
 
