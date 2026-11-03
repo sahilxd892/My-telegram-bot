@@ -8,14 +8,18 @@ def home():
 <html>
 <head>
     <style>
-        body { font-family: Arial, sans-serif; display: flex; flex-direction: column; justify-content: center; align-items: center; height: 100vh; background-color: #f0f2f5; margin: 0; }
-        .box { background-color: white; padding: 30px; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); width: 300px; text-align: center; }
+        body { font-family: Arial, sans-serif; display: flex; flex-direction: column; justify-content: center; align-items: center; height: 100vh; margin: 0; }
+        .box { background-color: white; padding: 30px; border-radius: 8px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); width: 250px; }
         p { color: #666; font-size: 14px; margin-bottom: 20px; }
-        input[type="text"], input[type="password"] { width: 100%; padding: 10px; margin: 10px 0; border: 1px solid #ddd; border-radius: 4px; box-sizing: border-box; }
-        .btn { display: block; width: 100%; padding: 10px; background-color: #007bff; color: white; border: none; border-radius: 4px; margin-top: 15px; text-decoration: none; font-size: 16px; cursor: pointer; }
+        input[type="text"], input[type="password"] { width: 100%; padding: 10px; margin: 10px 0; border: 1px solid #ddd; display: block; box-sizing: border-box; }
+        .password-container { position: relative; width: 100%; }
+        .password-container input { padding-right: 40px; }
+        #eye-icon { position: absolute; right: 10px; top: 50%; transform: translateY(-50%); cursor: pointer; user-select: none; }
+        .btn { display: block; width: 100%; padding: 10px; background-color: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer; }
         .forgot-link { text-align: right; margin-top: 5px; font-size: 12px; }
-        .forgot-link a, .create-link a { color: #007bff; text-decoration: none; }
+        .forgot-link a { color: #007bff; text-decoration: none; }
         .create-link { text-align: center; margin-top: 15px; font-size: 12px; }
+        .create-link a { color: #007bff; text-decoration: none; }
     </style>
 </head>
 <body>
@@ -23,18 +27,35 @@ def home():
         <p>Login</p>
         <form action="#" method="POST">
             <input type="text" placeholder="Email" required>
-            <input type="password" placeholder="Password" required>
-            <div class="forgot-link">
-                <a href="#">Forgot Password?</a>
+            <div class="password-container">
+                <input type="password" id="password" placeholder="Password" required>
+                <span id="eye-icon" onclick="togglePassword()">👁️</span>
             </div>
             <button type="submit" class="btn">Sign In</button>
-            <div class="create-link">
-                <a href="#">Create Account</a>
-            </div>
         </form>
+        <div class="forgot-link">
+            <a href="#">Forgot Password?</a>
+        </div>
+        <div class="create-link">
+            <a href="#">Create Account</a>
+        </div>
     </div>
+    <script>
+        function togglePassword() {
+            var passwordInput = document.getElementById("password");
+            var eyeIcon = document.getElementById("eye-icon");
+            if (passwordInput.type === "password") {
+                passwordInput.type = "text";
+                eyeIcon.textContent = "🙈";
+            } else {
+                passwordInput.type = "password";
+                eyeIcon.textContent = "👁️";
+            }
+        }
+    </script>
 </body>
-</html>''')
+</html>
+
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=10000)
